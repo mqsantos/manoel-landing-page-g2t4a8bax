@@ -27,10 +27,28 @@ import { PlanInterestService } from '@/services/contentService'
 import { PlanType } from '@/types/database'
 import { useAuth } from '@/context/AuthContext'
 import { useToast } from '@/hooks/use-toast'
+import { useSiteSettings } from '@/hooks/use-site-settings'
+
+/** Renderiza **negrito** simples dentro do texto de um benefício. */
+const BenefitText = ({ text }: { text: string }) => {
+  const parts = text.split(/\*\*(.+?)\*\*/g)
+  return (
+    <>
+      {parts.map((part, i) =>
+        i % 2 === 1 ? (
+          <strong key={i}>{part}</strong>
+        ) : (
+          <React.Fragment key={i}>{part}</React.Fragment>
+        ),
+      )}
+    </>
+  )
+}
 
 export default function Plans() {
   const { user } = useAuth()
   const { toast } = useToast()
+  const { settings } = useSiteSettings()
 
   const [selectedPlan, setSelectedPlan] = useState<PlanType | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
@@ -110,182 +128,118 @@ export default function Plans() {
           variant="outline"
           className="text-blue-700 bg-blue-50 border-blue-200 uppercase tracking-wider text-xs"
         >
-          Modelo Freemium em Pré-lançamento
+          {settings.plansHeader.badge}
         </Badge>
         <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
-          Planos transparentes para acelerar sua carreira em engenharia
+          {settings.plansHeader.title}
         </h1>
         <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
-          Hoje todo o acervo já pode ser explorado livremente. Escolha seu plano de preferência e
-          registre seu interesse para garantir condições exclusivas de fundador quando a cobrança
-          começar.
+          {settings.plansHeader.text}
         </p>
       </div>
 
       {/* Pricing Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
-        {/* Grátis */}
-        <Card className="border-border hover:shadow-lg transition-all flex flex-col justify-between bg-white">
-          <CardContent className="p-8 space-y-6 flex-1 flex flex-col justify-between">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-slate-900">Membro Grátis</h3>
-                <Badge variant="secondary" className="bg-slate-100 text-slate-700">
-                  Livre
-                </Badge>
-              </div>
-              <p className="text-xs text-slate-500">
-                Ideal para acompanhar os artigos e publicações fundamentais sem custo.
-              </p>
-              <div className="pt-2">
-                <span className="text-4xl font-extrabold text-slate-900">R$ 0</span>
-                <span className="text-xs text-slate-500 ml-1">/ para sempre</span>
-              </div>
-
-              <ul className="space-y-3 text-xs text-slate-600 pt-4 border-t border-slate-100">
-                <li className="flex items-start gap-2.5">
-                  <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
-                  <span>Acesso aos artigos "The Lean Developer" e "The Augmented Engineer"</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
-                  <span>Episódios abertos do podcast em áudio</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
-                  <span>Newsletter e atualizações por e-mail</span>
-                </li>
-                <li className="flex items-start gap-2.5 text-slate-400">
-                  <Lock className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                  <span>Masterclasses avançadas em vídeo</span>
-                </li>
-                <li className="flex items-start gap-2.5 text-slate-400">
-                  <Lock className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                  <span>Templates editáveis em PDF (A3 Framework)</span>
-                </li>
-              </ul>
-            </div>
-
-            <Button
-              variant="outline"
-              onClick={() => openInterestModal('gratis')}
-              className="w-full mt-6"
-            >
-              Criar Conta Grátis
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Pro (Destaque) */}
-        <Card className="border-2 border-blue-600 shadow-xl relative flex flex-col justify-between bg-white scale-105">
-          <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[11px] font-bold uppercase tracking-wider px-3.5 py-1 rounded-full shadow-sm flex items-center gap-1">
-            <Sparkles className="w-3.5 h-3.5" />
-            Mais Popular
-          </div>
-
-          <CardContent className="p-8 space-y-6 flex-1 flex flex-col justify-between pt-9">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-slate-900">Membro Pro</h3>
-                <Badge variant="secondary" className="bg-blue-100 text-blue-800 font-semibold">
-                  Completo
-                </Badge>
-              </div>
-              <p className="text-xs text-slate-500">
-                Acesso irrestrito a todos os materiais, masterclasses e templates de engenharia.
-              </p>
-              <div className="pt-2">
-                <div className="flex items-baseline">
-                  <span className="text-4xl font-extrabold text-slate-900">R$ 59</span>
-                  <span className="text-xs text-slate-500 ml-1">/ mês (ou R$ 49/mês no anual)</span>
+        {(
+          [
+            {
+              key: 'gratis' as const,
+              plan: settings.planFree,
+              cardClass:
+                'border-border hover:shadow-lg transition-all flex flex-col justify-between bg-white',
+              badgeClass: 'bg-slate-100 text-slate-700',
+              checkClass: 'text-emerald-500',
+              btnClass: 'w-full mt-6',
+              highlighted: false,
+              planType: 'gratis' as PlanType,
+            },
+            {
+              key: 'pro' as const,
+              plan: settings.planPro,
+              cardClass:
+                'border-2 border-blue-600 shadow-xl relative flex flex-col justify-between bg-white scale-105',
+              badgeClass: 'bg-blue-100 text-blue-800 font-semibold',
+              checkClass: 'text-blue-600',
+              btnClass:
+                'w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md shadow-blue-500/20',
+              highlighted: true,
+              planType: 'pro_mensal' as PlanType,
+            },
+            {
+              key: 'mentoria' as const,
+              plan: settings.planMentoria,
+              cardClass:
+                'border-border hover:shadow-lg transition-all flex flex-col justify-between bg-white',
+              badgeClass: 'text-indigo-700 border-indigo-200 bg-indigo-50',
+              checkClass: 'text-indigo-500',
+              btnClass: 'w-full mt-6 border-indigo-200 text-indigo-700 hover:bg-indigo-50',
+              highlighted: false,
+              planType: 'mentoria' as PlanType,
+            },
+          ] as const
+        ).map(
+          ({ key, plan, cardClass, badgeClass, checkClass, btnClass, highlighted, planType }) => (
+            <Card key={key} className={cardClass}>
+              {highlighted && plan.badge && (
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[11px] font-bold uppercase tracking-wider px-3.5 py-1 rounded-full shadow-sm flex items-center gap-1">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  {plan.badge}
                 </div>
-                <p className="text-[11px] text-blue-600 font-medium mt-1">
-                  Cobrança ainda não iniciada. Garanta 30% OFF de fundador.
-                </p>
-              </div>
+              )}
+              <CardContent
+                className={`p-8 space-y-6 flex-1 flex flex-col justify-between ${highlighted ? 'pt-9' : ''}`}
+              >
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-bold text-slate-900">{plan.name}</h3>
+                    {plan.badge && (
+                      <Badge variant="secondary" className={badgeClass}>
+                        {plan.badge}
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-500">{plan.description}</p>
+                  <div className="pt-2">
+                    <div className="flex items-baseline">
+                      <span className="text-4xl font-extrabold text-slate-900">{plan.price}</span>
+                      <span className="text-xs text-slate-500 ml-1">{plan.priceNote}</span>
+                    </div>
+                    {plan.note && (
+                      <p className="text-[11px] text-blue-600 font-medium mt-1">{plan.note}</p>
+                    )}
+                  </div>
 
-              <ul className="space-y-3 text-xs text-slate-700 pt-4 border-t border-slate-100">
-                <li className="flex items-start gap-2.5">
-                  <Check className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
-                  <span>
-                    <strong>Tudo do plano Grátis</strong>
-                  </span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <Check className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
-                  <span>Acesso integral a todas as Masterclasses em vídeo</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <Check className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
-                  <span>Download de todos os templates A3 e guias de processos em PDF</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <Check className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
-                  <span>Estudos de caso reais de engenharia aeroespacial e sistemas</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <Check className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
-                  <span>Badge exclusivo de Membro Fundador</span>
-                </li>
-              </ul>
-            </div>
+                  <ul className="space-y-3 text-xs text-slate-700 pt-4 border-t border-slate-100">
+                    {plan.benefits.map((b, i) => {
+                      const locked = b.startsWith('!')
+                      return (
+                        <li
+                          key={i}
+                          className={`flex items-start gap-2.5 ${locked ? 'text-slate-400' : ''}`}
+                        >
+                          {locked ? (
+                            <Lock className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                          ) : (
+                            <Check className={`w-4 h-4 flex-shrink-0 mt-0.5 ${checkClass}`} />
+                          )}
+                          <span>{locked ? b.slice(1) : <BenefitText text={b} />}</span>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                </div>
 
-            <Button
-              onClick={() => openInterestModal('pro_mensal')}
-              className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md shadow-blue-500/20"
-            >
-              Quero Assinar Pro (Registrar Interesse)
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Mentoria */}
-        <Card className="border-border hover:shadow-lg transition-all flex flex-col justify-between bg-white">
-          <CardContent className="p-8 space-y-6 flex-1 flex flex-col justify-between">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-slate-900">Mentoria Executiva</h3>
-                <Badge variant="outline" className="text-indigo-700 border-indigo-200 bg-indigo-50">
-                  Vagas Limitadas
-                </Badge>
-              </div>
-              <p className="text-xs text-slate-500">
-                Acompanhamento 1-on-1 direto com Manoel Santos para líderes e engenheiros seniores.
-              </p>
-              <div className="pt-2">
-                <span className="text-4xl font-extrabold text-slate-900">Sob Consulta</span>
-                <span className="text-xs text-slate-500 ml-1">/ programa individual</span>
-              </div>
-
-              <ul className="space-y-3 text-xs text-slate-600 pt-4 border-t border-slate-100">
-                <li className="flex items-start gap-2.5">
-                  <Check className="w-4 h-4 text-indigo-500 flex-shrink-0 mt-0.5" />
-                  <span>Sessões individuais de mentoria de carreira e liderança técnica</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <Check className="w-4 h-4 text-indigo-500 flex-shrink-0 mt-0.5" />
-                  <span>Revisão personalizada de arquitetura de processos e Lean</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <Check className="w-4 h-4 text-indigo-500 flex-shrink-0 mt-0.5" />
-                  <span>Canal direto com Manoel Santos via WhatsApp/Email</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <Check className="w-4 h-4 text-indigo-500 flex-shrink-0 mt-0.5" />
-                  <span>Acesso vitalício a todo o acervo Pro</span>
-                </li>
-              </ul>
-            </div>
-
-            <Button
-              variant="outline"
-              onClick={() => openInterestModal('mentoria')}
-              className="w-full mt-6 border-indigo-200 text-indigo-700 hover:bg-indigo-50"
-            >
-              Registrar Interesse em Mentoria
-            </Button>
-          </CardContent>
-        </Card>
+                <Button
+                  variant={highlighted ? 'default' : 'outline'}
+                  onClick={() => openInterestModal(planType)}
+                  className={btnClass}
+                >
+                  {plan.button}
+                </Button>
+              </CardContent>
+            </Card>
+          ),
+        )}
       </div>
 
       {/* Comparison Table */}

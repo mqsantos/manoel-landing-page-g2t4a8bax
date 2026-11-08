@@ -41,6 +41,7 @@ import { ContentService } from '@/services/contentService'
 import { ContentItem, ContentType } from '@/types/database'
 import { useAuth } from '@/context/AuthContext'
 import { useToast } from '@/hooks/use-toast'
+import SiteSettingsEditor from '@/components/owner/SiteSettingsEditor'
 
 export default function OwnerPanel() {
   const { user, isOwner } = useAuth()
@@ -261,6 +262,9 @@ export default function OwnerPanel() {
           </Button>
         </div>
       </div>
+
+      {/* Editar site (textos do Início e Planos) */}
+      <SiteSettingsEditor />
 
       {/* Contents Table / List */}
       <Card className="border-border shadow-sm">

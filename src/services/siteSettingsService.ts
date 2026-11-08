@@ -8,11 +8,35 @@ export interface SkillCard {
   bullets: string[]
 }
 
+export interface CtaButtons {
+  primary: string
+  secondary: string
+}
+
+export interface CtaBanner {
+  badge: string
+  title: string
+  text: string
+  buttonPrimary: string
+  buttonSecondary: string
+}
+
+export interface PlansHeader {
+  badge: string
+  title: string
+  text: string
+}
+
 export interface PlanSettings {
   name: string
+  badge: string
   description: string
   price: string
   priceNote: string
+  /** Texto opcional abaixo do preço (ex: nota de fundador do plano Pro). */
+  note: string
+  /** Texto do botão de ação do plano. */
+  button: string
   /** Uma linha por benefício. Começar a linha com "!" marca benefício não incluído. */
   benefits: string[]
 }
@@ -21,18 +45,33 @@ export interface SiteSettings {
   headline: string
   headlineHighlight: string
   bio: string
+  subBio: string
+  heroRole: string
+  heroCompany: string
+  credentials: string[]
   highlights: string[]
   skills: SkillCard[]
-  profilePhotoUrl: string
+  ctaButtons: CtaButtons
+  ctaBanner: CtaBanner
+  plansHeader: PlansHeader
   planFree: PlanSettings
   planPro: PlanSettings
+  planMentoria: PlanSettings
+  profilePhotoUrl: string
 }
 
+const DEFAULT_PHOTO_URL = 'https://img.usecurling.com/ppl/medium?gender=male&seed=48'
+
 /** Valores iniciais: exatamente os textos que o site exibia antes de ser editável. */
-export const DEFAULT_SITE_SETTINGS: SiteSettings = {
+const DEFAULT_SITE_SETTINGS: SiteSettings = {
   headline: 'Excelência em Engenharia &',
   headlineHighlight: 'Transformação Lean',
   bio: 'Olá, sou **Manoel Santos**. Lidero engenharia de sistemas na **Boeing** após mais de **20 anos na Embraer** conduzindo a transformação cultural de Lean Product and Process Development (LPPD).',
+  subBio:
+    'Ajudo engenheiros, líderes e organizações de tecnologia a acelerar inovação com rigor técnico, métodos ágeis e inteligência artificial generativa aplicada à engenharia complexa.',
+  heroRole: 'Systems Engineering Manager',
+  heroCompany: 'Boeing Company',
+  credentials: ['20+ anos Embraer', 'Liderança Boeing', 'M.Sc. Eng. Mecânica'],
   highlights: [
     'Especialista em Lean Product & Process Development (LPPD)',
     'Autor dos frameworks "The Lean Developer" e "The Augmented Engineer"',
@@ -67,12 +106,30 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
       ],
     },
   ],
-  profilePhotoUrl: 'https://img.usecurling.com/ppl/medium?gender=male&seed=48',
+  ctaButtons: {
+    primary: 'Acessar Conteúdos Gratuitos',
+    secondary: 'Conhecer Área Premium',
+  },
+  ctaBanner: {
+    badge: 'Assinatura Freemium em Preparação',
+    title: 'Quer ter acesso aos masterclasses, templates A3 e mentorias?',
+    text: 'Estamos preparando a área exclusiva de assinantes. Registre seu interesse agora para garantir condições especiais de lançamento e acesso prioritário aos materiais restritos.',
+    buttonPrimary: 'Ver Planos & Registrar Interesse',
+    buttonSecondary: 'Criar Conta Gratuita',
+  },
+  plansHeader: {
+    badge: 'Modelo Freemium em Pré-lançamento',
+    title: 'Planos transparentes para acelerar sua carreira em engenharia',
+    text: 'Hoje todo o acervo já pode ser explorado livremente. Escolha seu plano de preferência e registre seu interesse para garantir condições exclusivas de fundador quando a cobrança começar.',
+  },
   planFree: {
     name: 'Membro Grátis',
+    badge: 'Livre',
     description: 'Ideal para acompanhar os artigos e publicações fundamentais sem custo.',
     price: 'R$ 0',
     priceNote: '/ para sempre',
+    note: '',
+    button: 'Criar Conta Grátis',
     benefits: [
       'Acesso aos artigos "The Lean Developer" e "The Augmented Engineer"',
       'Episódios abertos do podcast em áudio',
@@ -83,9 +140,12 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   },
   planPro: {
     name: 'Membro Pro',
+    badge: 'Completo',
     description: 'Acesso irrestrito a todos os materiais, masterclasses e templates de engenharia.',
     price: 'R$ 59',
     priceNote: '/ mês (ou R$ 49/mês no anual)',
+    note: 'Cobrança ainda não iniciada. Garanta 30% OFF de fundador.',
+    button: 'Quero Assinar Pro (Registrar Interesse)',
     benefits: [
       '**Tudo do plano Grátis**',
       'Acesso integral a todas as Masterclasses em vídeo',
@@ -94,6 +154,23 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
       'Badge exclusivo de Membro Fundador',
     ],
   },
+  planMentoria: {
+    name: 'Mentoria Executiva',
+    badge: 'Vagas Limitadas',
+    description:
+      'Acompanhamento 1-on-1 direto com Manoel Santos para líderes e engenheiros seniores.',
+    price: 'Sob Consulta',
+    priceNote: '/ programa individual',
+    note: '',
+    button: 'Registrar Interesse em Mentoria',
+    benefits: [
+      'Sessões individuais de mentoria de carreira e liderança técnica',
+      'Revisão personalizada de arquitetura de processos e Lean',
+      'Canal direto com Manoel Santos via WhatsApp/Email',
+      'Acesso vitalício a todo o acervo Pro',
+    ],
+  },
+  profilePhotoUrl: DEFAULT_PHOTO_URL,
 }
 
 const asText = (value: unknown, fallback: string): string =>
@@ -105,6 +182,11 @@ const asList = (value: unknown, fallback: string[]): string[] => {
   return list.length ? list : fallback
 }
 
+const parseJson = (raw: unknown, fallback: string): string => {
+  if (typeof raw === 'string' && raw.trim()) return raw
+  return fallback
+}
+
 const normalizeSkills = (value: unknown, fallback: SkillCard[]): SkillCard[] => {
   if (!Array.isArray(value) || value.length === 0) return fallback
   return value.map((raw) => ({
@@ -114,13 +196,48 @@ const normalizeSkills = (value: unknown, fallback: SkillCard[]): SkillCard[] => 
   }))
 }
 
+const normalizeCtaButtons = (value: unknown, fallback: CtaButtons): CtaButtons => {
+  if (!value || typeof value !== 'object') return fallback
+  const raw = value as Record<string, unknown>
+  return {
+    primary: asText(raw.primary, fallback.primary),
+    secondary: asText(raw.secondary, fallback.secondary),
+  }
+}
+
+const normalizeCtaBanner = (value: unknown, fallback: CtaBanner): CtaBanner => {
+  if (!value || typeof value !== 'object') return fallback
+  const raw = value as Record<string, unknown>
+  return {
+    badge: asText(raw.badge, fallback.badge),
+    title: asText(raw.title, fallback.title),
+    text: asText(raw.text, fallback.text),
+    buttonPrimary: asText(raw.buttonPrimary, fallback.buttonPrimary),
+    buttonSecondary: asText(raw.buttonSecondary, fallback.buttonSecondary),
+  }
+}
+
+const normalizePlansHeader = (value: unknown, fallback: PlansHeader): PlansHeader => {
+  if (!value || typeof value !== 'object') return fallback
+  const raw = value as Record<string, unknown>
+  return {
+    badge: asText(raw.badge, fallback.badge),
+    title: asText(raw.title, fallback.title),
+    text: asText(raw.text, fallback.text),
+  }
+}
+
 const normalizePlan = (value: unknown, fallback: PlanSettings): PlanSettings => {
-  const raw = (value && typeof value === 'object' ? value : {}) as Record<string, unknown>
+  if (!value || typeof value !== 'object') return fallback
+  const raw = value as Record<string, unknown>
   return {
     name: asText(raw.name, fallback.name),
+    badge: asText(raw.badge, fallback.badge),
     description: asText(raw.description, fallback.description),
     price: asText(raw.price, fallback.price),
     priceNote: asText(raw.priceNote, fallback.priceNote),
+    note: typeof raw.note === 'string' ? raw.note : fallback.note,
+    button: asText(raw.button, fallback.button),
     benefits: asList(raw.benefits, fallback.benefits),
   }
 }
@@ -132,15 +249,28 @@ const fromRecord = (r: any): SiteSettings => {
     headline: asText(r.headline, d.headline),
     headlineHighlight: asText(r.headline_highlight, d.headlineHighlight),
     bio: asText(r.bio, d.bio),
+    subBio: asText(r.sub_bio, d.subBio),
+    heroRole: asText(r.hero_role, d.heroRole),
+    heroCompany: asText(r.hero_company, d.heroCompany),
+    credentials: asList(r.credentials, d.credentials),
     highlights: asList(r.highlights, d.highlights),
     skills: normalizeSkills(r.skills, d.skills),
-    profilePhotoUrl: r.profile_photo ? pb.files.getUrl(r, r.profile_photo) : d.profilePhotoUrl,
+    ctaButtons: normalizeCtaButtons(r.cta_buttons, d.ctaButtons),
+    ctaBanner: normalizeCtaBanner(r.cta_banner, d.ctaBanner),
+    plansHeader: normalizePlansHeader(r.plans_header, d.plansHeader),
     planFree: normalizePlan(r.plan_free, d.planFree),
     planPro: normalizePlan(r.plan_pro, d.planPro),
+    planMentoria: normalizePlan(r.plan_mentoria, d.planMentoria),
+    profilePhotoUrl: r.profile_photo ? pb.files.getUrl(r, r.profile_photo) : DEFAULT_PHOTO_URL,
   }
 }
 
 export const SiteSettingsService = {
+  /** Cópia nova dos valores padrão (fallback enquanto o banco não responde). */
+  defaults(): SiteSettings {
+    return JSON.parse(JSON.stringify(DEFAULT_SITE_SETTINGS)) as SiteSettings
+  },
+
   /** Lê a configuração salva. `id` é null enquanto nada foi salvo (valem os padrões). */
   async load(): Promise<{ id: string | null; settings: SiteSettings }> {
     const res = await pb.collection(SETTINGS_COLLECTION).getList(1, 1)
@@ -155,10 +285,18 @@ export const SiteSettingsService = {
     body.append('headline', settings.headline.trim())
     body.append('headline_highlight', settings.headlineHighlight.trim())
     body.append('bio', settings.bio.trim())
+    body.append('sub_bio', settings.subBio.trim())
+    body.append('hero_role', settings.heroRole.trim())
+    body.append('hero_company', settings.heroCompany.trim())
+    body.append('credentials', JSON.stringify(settings.credentials))
     body.append('highlights', JSON.stringify(settings.highlights))
     body.append('skills', JSON.stringify(settings.skills))
+    body.append('cta_buttons', JSON.stringify(settings.ctaButtons))
+    body.append('cta_banner', JSON.stringify(settings.ctaBanner))
+    body.append('plans_header', JSON.stringify(settings.plansHeader))
     body.append('plan_free', JSON.stringify(settings.planFree))
     body.append('plan_pro', JSON.stringify(settings.planPro))
+    body.append('plan_mentoria', JSON.stringify(settings.planMentoria))
     if (photo) body.append('profile_photo', photo)
 
     if (id) {

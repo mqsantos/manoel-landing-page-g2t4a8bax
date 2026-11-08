@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-08T16:27:17.921Z",
+  "generatedAt": "2026-11-08T16:46:41.305Z",
   "collections": [
     {
       "name": "users",
@@ -309,6 +309,130 @@
         "CREATE INDEX idx_content_views_content ON content_views (content_id)",
         "CREATE INDEX idx_content_views_created ON content_views (created DESC)"
       ]
+    },
+    {
+      "name": "site_settings",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "@request.auth.id != '' && @request.auth.email = 'mqsantos@gmail.com'",
+        "update": "@request.auth.id != '' && @request.auth.email = 'mqsantos@gmail.com'",
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "headline",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "headline_highlight",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "bio",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "sub_bio",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "hero_role",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "hero_company",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "credentials",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "highlights",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "skills",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cta_banner",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cta_buttons",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "plans_header",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "plan_free",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "plan_pro",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "plan_mentoria",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "profile_photo",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": []
     }
   ]
 }

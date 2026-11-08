@@ -9,23 +9,45 @@ import {
   Video,
   Headphones,
   Sparkles,
-  ShieldCheck,
-  Award,
   Briefcase,
+  Award,
   GraduationCap,
-  Cpu,
   Layers,
   ChevronRight,
   ExternalLink,
   Lock,
+  Cpu,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { ContentService } from '@/services/contentService'
 import { ContentItem } from '@/types/database'
+import { useSiteSettings } from '@/hooks/use-site-settings'
+import { SkillCard } from '@/services/siteSettingsService'
+
+/** Renderiza **negrito** dentro de um texto editável pelo dono. */
+export function RichText({ text }: { text: string }) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g)
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.startsWith('**') && part.endsWith('**') ? (
+          <strong key={i} className="text-white font-semibold">
+            {part.slice(2, -2)}
+          </strong>
+        ) : (
+          <span key={i}>{part}</span>
+        ),
+      )}
+    </>
+  )
+}
+
+const SKILL_ICONS = [Briefcase, Layers, Cpu]
 
 export default function Index() {
+  const { settings } = useSiteSettings()
   const [featuredContents, setFeaturedContents] = useState<ContentItem[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -62,6 +84,8 @@ export default function Index() {
     }
   }
 
+  const credentialIcons = [Briefcase, Award, GraduationCap]
+
   return (
     <div className="space-y-20 pb-20">
       {/* Hero Section */}
@@ -75,27 +99,24 @@ export default function Index() {
             <div className="lg:col-span-7 space-y-6">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold tracking-wide uppercase">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Systems Engineering Manager | Boeing</span>
+                <span>
+                  {settings.heroRole} | {settings.heroCompany}
+                </span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.1]">
-                Excelência em Engenharia &{' '}
+                {settings.headline}{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-sky-400">
-                  Transformação Lean
+                  {settings.headlineHighlight}
                 </span>
               </h1>
 
               <p className="text-lg sm:text-xl text-slate-300 font-light leading-relaxed max-w-2xl">
-                Olá, sou <strong className="text-white font-semibold">Manoel Santos</strong>. Lidero
-                engenharia de sistemas na <strong className="text-white">Boeing</strong> após mais
-                de <strong className="text-white">20 anos na Embraer</strong> conduzindo a
-                transformação cultural de Lean Product and Process Development (LPPD).
+                <RichText text={settings.bio} />
               </p>
 
               <p className="text-sm sm:text-base text-slate-400 leading-relaxed max-w-2xl">
-                Ajudo engenheiros, líderes e organizações de tecnologia a acelerar inovação com
-                rigor técnico, métodos ágeis e inteligência artificial generativa aplicada à
-                engenharia complexa.
+                {settings.subBio}
               </p>
 
               {/* Action Buttons */}
@@ -105,7 +126,7 @@ export default function Index() {
                     size="lg"
                     className="bg-blue-600 hover:bg-blue-500 text-white font-medium shadow-lg shadow-blue-600/30 gap-2 h-12 px-6"
                   >
-                    Acessar Conteúdos Gratuitos
+                    {settings.ctaButtons.primary}
                     <ArrowRight className="w-4 h-4" />
                   </Button>
                 </Link>
@@ -115,25 +136,22 @@ export default function Index() {
                     variant="outline"
                     className="border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-white font-medium h-12 px-6 gap-2"
                   >
-                    Conhecer Área Premium
+                    {settings.ctaButtons.secondary}
                   </Button>
                 </Link>
               </div>
 
               {/* Quick credentials badges */}
               <div className="pt-6 grid grid-cols-2 sm:grid-cols-3 gap-4 border-t border-slate-800/80 text-xs text-slate-400">
-                <div className="flex items-center gap-2">
-                  <Briefcase className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                  <span>20+ anos Embraer</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Award className="w-4 h-4 text-indigo-400 flex-shrink-0" />
-                  <span>Liderança Boeing</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <GraduationCap className="w-4 h-4 text-sky-400 flex-shrink-0" />
-                  <span>M.Sc. Eng. Mecânica</span>
-                </div>
+                {settings.credentials.map((label, i) => {
+                  const Icon = credentialIcons[i % credentialIcons.length]
+                  return (
+                    <div key={i} className="flex items-center gap-2">
+                      <Icon className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                      <span>{label}</span>
+                    </div>
+                  )
+                })}
               </div>
             </div>
 
@@ -148,7 +166,7 @@ export default function Index() {
                     <div className="relative">
                       <div className="w-24 h-24 rounded-2xl overflow-hidden ring-2 ring-blue-500/50 shadow-md bg-slate-800">
                         <img
-                          src="https://img.usecurling.com/ppl/medium?gender=male&seed=48"
+                          src={settings.profilePhotoUrl}
                           alt="Manoel Santos"
                           className="w-full h-full object-cover"
                         />
@@ -162,35 +180,25 @@ export default function Index() {
                     </div>
                     <div>
                       <h3 className="text-xl font-bold text-white tracking-tight">Manoel Santos</h3>
-                      <p className="text-xs text-blue-400 font-medium">
-                        Systems Engineering Manager
-                      </p>
-                      <p className="text-xs text-slate-400 mt-0.5">Boeing Company</p>
-                      <div className="mt-2 flex items-center gap-2">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] bg-slate-800 text-slate-300 border border-slate-700">
-                          M.Sc. Engenharia
-                        </span>
-                      </div>
+                      <p className="text-xs text-blue-400 font-medium">{settings.heroRole}</p>
+                      <p className="text-xs text-slate-400 mt-0.5">{settings.heroCompany}</p>
+                      {settings.credentials[0] && (
+                        <div className="mt-2 flex items-center gap-2">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] bg-slate-800 text-slate-300 border border-slate-700">
+                            {settings.credentials[0]}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
                   <div className="space-y-3.5 text-xs text-slate-300 pb-6 border-b border-slate-800">
-                    <div className="flex items-start gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
-                      <span>Especialista em Lean Product & Process Development (LPPD)</span>
-                    </div>
-                    <div className="flex items-start gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
-                      <span>
-                        Autor dos frameworks "The Lean Developer" e "The Augmented Engineer"
-                      </span>
-                    </div>
-                    <div className="flex items-start gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
-                      <span>
-                        Mentoria executiva para engenharia e transição de carreira técnica
-                      </span>
-                    </div>
+                    {settings.highlights.map((line, i) => (
+                      <div key={i} className="flex items-start gap-2.5">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
+                        <span>{line}</span>
+                      </div>
+                    ))}
                   </div>
 
                   {/* Links in card */}
@@ -239,60 +247,35 @@ export default function Index() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Card 1 */}
-          <Card className="border-border hover:shadow-lg transition-all duration-300 hover:border-blue-200">
-            <CardContent className="p-8 space-y-4">
-              <div className="w-12 h-12 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
-                <Briefcase className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900">Embraer & Boeing</h3>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                20 anos liderando o programa de melhoria contínua na Embraer, integrando times de
-                projeto de aeronaves comerciais, executivas e de defesa. Atualmente atuando como
-                Systems Engineering Manager na Boeing.
-              </p>
-              <ul className="text-xs text-slate-500 space-y-1.5 pt-2">
-                <li>• Gestão de interfaces complexas e fornecedores internacionais</li>
-                <li>• Arquitetura e certificação de sistemas aeronáuticos</li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          {/* Card 2 */}
-          <Card className="border-border hover:shadow-lg transition-all duration-300 hover:border-blue-200">
-            <CardContent className="p-8 space-y-4">
-              <div className="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
-                <Layers className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900">Lean Product Development</h3>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                Pioneiro na implementação do LPPD. Eliminação de desperdício em fases de concepção e
-                especificação, antes mesmo da primeira linha de código ou corte de peça.
-              </p>
-              <ul className="text-xs text-slate-500 space-y-1.5 pt-2">
-                <li>• Metodologia A3 para resolução de problemas crônicos</li>
-                <li>• Set-Based Concurrent Engineering e Obeya War Rooms</li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          {/* Card 3 */}
-          <Card className="border-border hover:shadow-lg transition-all duration-300 hover:border-blue-200">
-            <CardContent className="p-8 space-y-4">
-              <div className="w-12 h-12 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center font-bold">
-                <Cpu className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900">The Augmented Engineer</h3>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                Integração de Inteligência Artificial Generativa no fluxo de engenharia de
-                requisitos, testes automatizados e gestão do conhecimento técnico de alta densidade.
-              </p>
-              <ul className="text-xs text-slate-500 space-y-1.5 pt-2">
-                <li>• Rastreabilidade ágil de requisitos com LLMs</li>
-                <li>• Aceleração de decisões técnicas sem perda de rigor</li>
-              </ul>
-            </CardContent>
-          </Card>
+          {settings.skills.map((skill: SkillCard, i) => {
+            const Icon = SKILL_ICONS[i % SKILL_ICONS.length]
+            const iconStyles = [
+              'bg-blue-100 text-blue-700',
+              'bg-indigo-100 text-indigo-700',
+              'bg-sky-100 text-sky-700',
+            ]
+            return (
+              <Card
+                key={i}
+                className="border-border hover:shadow-lg transition-all duration-300 hover:border-blue-200"
+              >
+                <CardContent className="p-8 space-y-4">
+                  <div
+                    className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold ${iconStyles[i % iconStyles.length]}`}
+                  >
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900">{skill.title}</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">{skill.description}</p>
+                  <ul className="text-xs text-slate-500 space-y-1.5 pt-2">
+                    {skill.bullets.map((b, j) => (
+                      <li key={j}>• {b}</li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            )
+          })}
         </div>
       </section>
 
@@ -472,17 +455,15 @@ export default function Index() {
           <div className="relative z-10 max-w-2xl space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-semibold">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Assinatura Freemium em Preparação</span>
+              <span>{settings.ctaBanner.badge}</span>
             </div>
 
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
-              Quer ter acesso aos masterclasses, templates A3 e mentorias?
+              {settings.ctaBanner.title}
             </h2>
 
             <p className="text-base text-blue-100 leading-relaxed font-light">
-              Estamos preparando a área exclusiva de assinantes. Registre seu interesse agora para
-              garantir condições especiais de lançamento e acesso prioritário aos materiais
-              restritos.
+              {settings.ctaBanner.text}
             </p>
 
             <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -491,7 +472,7 @@ export default function Index() {
                   size="lg"
                   className="bg-white hover:bg-slate-100 text-slate-900 font-bold h-12 px-6"
                 >
-                  Ver Planos & Registrar Interesse
+                  {settings.ctaBanner.buttonPrimary}
                 </Button>
               </Link>
               <Link to="/cadastro">
@@ -500,7 +481,7 @@ export default function Index() {
                   variant="outline"
                   className="border-white/30 text-white hover:bg-white/10 h-12 px-6"
                 >
-                  Criar Conta Gratuita
+                  {settings.ctaBanner.buttonSecondary}
                 </Button>
               </Link>
             </div>
