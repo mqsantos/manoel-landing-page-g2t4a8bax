@@ -165,11 +165,17 @@ export default function Index() {
                   <div className="flex items-center gap-5 mb-6">
                     <div className="relative">
                       <div className="w-24 h-24 rounded-2xl overflow-hidden ring-2 ring-blue-500/50 shadow-md bg-slate-800">
-                        <img
-                          src={settings.profilePhotoUrl}
-                          alt="Manoel Santos"
-                          className="w-full h-full object-cover"
-                        />
+                        {settings.profilePhotoUrl ? (
+                          <img
+                            src={settings.profilePhotoUrl}
+                            alt="Manoel Santos"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-white font-bold text-2xl">
+                            MS
+                          </div>
+                        )}
                       </div>
                       <div
                         className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-emerald-500 border-2 border-slate-900 flex items-center justify-center"

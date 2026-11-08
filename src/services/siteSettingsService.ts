@@ -85,8 +85,11 @@ export interface SiteSettings {
   profilePhotoUrl: string
 }
 
-const DEFAULT_PHOTO_URL = 'https://img.usecurling.com/ppl/medium?gender=male&seed=48'
-
+/**
+ * Fallback para quando o dono ainda não enviou a foto oficial.
+ * Vazio de propósito: a UI exibe as iniciais "MS" em vez de uma foto fake.
+ */
+const DEFAULT_PHOTO_URL = ''
 /** Valores iniciais: exatamente os textos que o site exibia antes de ser editável. */
 const DEFAULT_SITE_SETTINGS: SiteSettings = {
   headline: 'Excelência em Engenharia &',

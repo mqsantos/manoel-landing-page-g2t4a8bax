@@ -22,11 +22,13 @@ import { ContentService, AnalyticsService } from '@/services/contentService'
 import { ContentItem } from '@/types/database'
 import { useAuth } from '@/context/AuthContext'
 import { useToast } from '@/hooks/use-toast'
+import { useSiteSettings } from '@/hooks/use-site-settings'
 
 export default function ContentDetail() {
   const { slug } = useParams<{ slug: string }>()
   const { user } = useAuth()
   const { toast } = useToast()
+  const { settings } = useSiteSettings()
   const [content, setContent] = useState<ContentItem | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -349,11 +351,17 @@ export default function ContentDetail() {
       {/* Author Card Footer */}
       <div className="mt-12 p-6 rounded-2xl bg-slate-50 border border-border flex items-center gap-5">
         <div className="w-16 h-16 rounded-2xl overflow-hidden bg-slate-800 ring-2 ring-blue-500/30 flex-shrink-0">
-          <img
-            src="https://img.usecurling.com/ppl/thumbnail?gender=male&seed=48"
-            alt="Manoel Santos"
-            className="w-full h-full object-cover"
-          />
+          {settings.profilePhotoUrl ? (
+            <img
+              src={settings.profilePhotoUrl}
+              alt="Manoel Santos"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-white font-bold text-lg">
+              MS
+            </div>
+          )}
         </div>
         <div className="space-y-1">
           <h4 className="font-bold text-slate-900 text-base">Publicado por Manoel Santos</h4>
