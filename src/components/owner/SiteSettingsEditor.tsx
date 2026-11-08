@@ -10,153 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToast } from '@/hooks/use-toast'
 import { SiteSettings, SiteSettingsService } from '@/services/siteSettingsService'
 import { invalidateSiteSettings } from '@/hooks/use-site-settings'
-
-/** Uma lista de linhas de texto editáveis (adicionar, editar, remover, reordenar). */
-function LinesEditor({
-  label,
-  hint,
-  rows,
-  onChange,
-}: {
-  label: string
-  hint?: string
-  rows: string[]
-  onChange: (rows: string[]) => void
-}) {
-  const update = (i: number, value: string) => {
-    const next = [...rows]
-    next[i] = value
-    onChange(next)
-  }
-  const remove = (i: number) => onChange(rows.filter((_, j) => j !== i))
-  const move = (i: number, delta: number) => {
-    const j = i + delta
-    if (j < 0 || j >= rows.length) return
-    const next = [...rows]
-    ;[next[i], next[j]] = [next[j], next[i]]
-    onChange(next)
-  }
-
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <Label className="text-xs font-semibold">{label}</Label>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="h-7 text-[11px]"
-          onClick={() => onChange([...rows, ''])}
-        >
-          + Adicionar linha
-        </Button>
-      </div>
-      {hint && <p className="text-[11px] text-slate-500">{hint}</p>}
-      <div className="space-y-2">
-        {rows.map((row, i) => (
-          <div key={i} className="flex items-center gap-1.5">
-            <Input
-              value={row}
-              onChange={(e) => update(i, e.target.value)}
-              className="text-xs"
-              placeholder={`Linha ${i + 1}`}
-            />
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 flex-shrink-0 text-slate-400 hover:text-slate-700"
-              title="Mover para cima"
-              onClick={() => move(i, -1)}
-              disabled={i === 0}
-            >
-              ↑
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 flex-shrink-0 text-slate-400 hover:text-slate-700"
-              title="Mover para baixo"
-              onClick={() => move(i, 1)}
-              disabled={i === rows.length - 1}
-            >
-              ↓
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 flex-shrink-0 text-rose-500 hover:text-rose-700"
-              title="Remover linha"
-              onClick={() => remove(i)}
-            >
-              ✕
-            </Button>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-/** Editor de um cartão de skill (título, descrição e bullets). */
-function SkillEditor({
-  index,
-  skill,
-  onChange,
-  onRemove,
-}: {
-  index: number
-  skill: { title: string; description: string; bullets: string[] }
-  onChange: (next: { title: string; description: string; bullets: string[] }) => void
-  onRemove: () => void
-}) {
-  return (
-    <Card className="border-slate-200">
-      <CardContent className="p-4 space-y-3">
-        <div className="flex items-center justify-between">
-          <Badge variant="secondary" className="bg-slate-100 text-slate-700 text-[11px]">
-            Cartão {index + 1}
-          </Badge>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="h-7 text-[11px] text-rose-500 hover:text-rose-700"
-            onClick={onRemove}
-          >
-            Remover cartão
-          </Button>
-        </div>
-        <div className="space-y-1.5">
-          <Label className="text-xs font-semibold">Título</Label>
-          <Input
-            value={skill.title}
-            onChange={(e) => onChange({ ...skill, title: e.target.value })}
-            className="text-xs"
-            placeholder="Ex: Embraer & Boeing"
-          />
-        </div>
-        <div className="space-y-1.5">
-          <Label className="text-xs font-semibold">Descrição</Label>
-          <Textarea
-            value={skill.description}
-            onChange={(e) => onChange({ ...skill, description: e.target.value })}
-            className="text-xs"
-            rows={3}
-            placeholder="Resumo da experiência..."
-          />
-        </div>
-        <LinesEditor
-          label="Bullets"
-          rows={skill.bullets}
-          onChange={(bullets) => onChange({ ...skill, bullets })}
-        />
-      </CardContent>
-    </Card>
-  )
-}
+import { LinesEditor, SkillEditor } from '@/components/owner/SettingsFormFields'
+import { FooterSettingsTab } from '@/components/owner/FooterSettingsTab'
 
 /** Editor de um plano (nome, badge, descrição, preço e benefícios). */
 function PlanEditor({
@@ -327,12 +182,12 @@ export default function SiteSettingsEditor() {
               <Globe className="w-5 h-5 text-blue-600" />
               <h2 className="text-lg font-bold text-slate-900">Editar site</h2>
               <Badge variant="secondary" className="bg-blue-100 text-blue-800 text-[11px]">
-                Início & Planos
+                Início, Planos & Rodapé
               </Badge>
             </div>
             <p className="text-xs text-slate-500 mt-1">
-              Edite os textos das páginas Início e Planos & Assinatura. Ao salvar, as mudanças
-              aparecem imediatamente no site.
+              Edite os textos das páginas Início e Planos & Assinatura e do rodapé. Ao salvar, as
+              mudanças aparecem imediatamente no site.
             </p>
           </div>
           <Button
@@ -353,12 +208,15 @@ export default function SiteSettingsEditor() {
         )}
 
         <Tabs defaultValue="inicio" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsList className="grid w-full grid-cols-3 mb-4">
             <TabsTrigger value="inicio" className="text-xs">
               Página Início
             </TabsTrigger>
             <TabsTrigger value="planos" className="text-xs">
               Página Planos
+            </TabsTrigger>
+            <TabsTrigger value="rodape" className="text-xs">
+              Rodapé
             </TabsTrigger>
           </TabsList>
 
@@ -650,6 +508,11 @@ export default function SiteSettingsEditor() {
                 onChange={(planMentoria) => patch({ planMentoria })}
               />
             </div>
+          </TabsContent>
+
+          {/* ============ ABA RODAPÉ ============ */}
+          <TabsContent value="rodape" className="space-y-6">
+            <FooterSettingsTab settings={settings} onPatch={patch} />
           </TabsContent>
         </Tabs>
       </CardContent>

@@ -27,6 +27,30 @@ export interface PlansHeader {
   text: string
 }
 
+export interface FooterNavLinks {
+  /** Link por rota interna (ex: "/planos"). */
+  label: string
+  path: string
+}
+
+export interface FooterSettings {
+  brandInitials: string
+  brandName: string
+  bio: string
+  linkedinLabel: string
+  linkedinUrl: string
+  emailLabel: string
+  email: string
+  navTitle: string
+  navLinks: FooterNavLinks[]
+  themesTitle: string
+  themes: string[]
+  copyright: string
+  secureLabel: string
+  subscribersLinkLabel: string
+  subscribersLinkPath: string
+}
+
 export interface PlanSettings {
   name: string
   badge: string
@@ -57,6 +81,7 @@ export interface SiteSettings {
   planFree: PlanSettings
   planPro: PlanSettings
   planMentoria: PlanSettings
+  footer: FooterSettings
   profilePhotoUrl: string
 }
 
@@ -170,6 +195,35 @@ const DEFAULT_SITE_SETTINGS: SiteSettings = {
       'Acesso vitalício a todo o acervo Pro',
     ],
   },
+  footer: {
+    brandInitials: 'MS',
+    brandName: 'Manoel Santos',
+    bio: 'Systems Engineering Manager na Boeing. Mais de 20 anos de trajetória na Embraer liderando Transformação Lean e Lean Product & Process Development (LPPD). Engenheiro Mecânico com M.Sc.',
+    linkedinLabel: 'LinkedIn Oficial',
+    linkedinUrl: 'https://www.linkedin.com/in/manoelsantos/',
+    emailLabel: 'mqsantos@gmail.com',
+    email: 'mqsantos@gmail.com',
+    navTitle: 'Navegação',
+    navLinks: [
+      { label: 'Início & Biografia', path: '/' },
+      { label: 'Acervo de Conteúdos', path: '/conteudos' },
+      { label: 'Planos & Assinatura Freemium', path: '/planos' },
+      { label: 'Criar Conta Gratuita', path: '/cadastro' },
+      { label: 'Área de Membros (Entrar)', path: '/login' },
+    ],
+    themesTitle: 'Temas Principais',
+    themes: [
+      'Lean Product & Process Development',
+      'Systems Engineering & MBSE',
+      'The Augmented Engineer & IA',
+      'Metodologia A3 & Liderança',
+      'Gestão Aeroespacial Global',
+    ],
+    copyright: '© {ano} Manoel Santos. Todos os direitos reservados.',
+    secureLabel: 'Ambiente Seguro',
+    subscribersLinkLabel: 'Programa de Assinantes',
+    subscribersLinkPath: '/planos',
+  },
   profilePhotoUrl: DEFAULT_PHOTO_URL,
 }
 
@@ -227,6 +281,46 @@ const normalizePlansHeader = (value: unknown, fallback: PlansHeader): PlansHeade
   }
 }
 
+/** Aceita "/planos" ou "https://..." — links internos viram rotas do React Router. */
+const asFooterPath = (value: unknown, fallback: string): string => {
+  if (typeof value !== 'string' || !value.trim()) return fallback
+  const v = value.trim()
+  return v.startsWith('/') || v.startsWith('http') || v.startsWith('mailto:') ? v : `/${v}`
+}
+
+const normalizeFooterNavLinks = (value: unknown, fallback: FooterNavLinks[]): FooterNavLinks[] => {
+  if (!Array.isArray(value) || value.length === 0) return fallback
+  const links = value
+    .map((raw) => ({
+      label: asText(raw?.label, ''),
+      path: asFooterPath(raw?.path, ''),
+    }))
+    .filter((link) => link.label && link.path)
+  return links.length ? links : fallback
+}
+
+const normalizeFooter = (value: unknown, fallback: FooterSettings): FooterSettings => {
+  if (!value || typeof value !== 'object') return fallback
+  const raw = value as Record<string, unknown>
+  return {
+    brandInitials: asText(raw.brandInitials, fallback.brandInitials),
+    brandName: asText(raw.brandName, fallback.brandName),
+    bio: asText(raw.bio, fallback.bio),
+    linkedinLabel: asText(raw.linkedinLabel, fallback.linkedinLabel),
+    linkedinUrl: asText(raw.linkedinUrl, fallback.linkedinUrl),
+    emailLabel: asText(raw.emailLabel, fallback.emailLabel),
+    email: asText(raw.email, fallback.email),
+    navTitle: asText(raw.navTitle, fallback.navTitle),
+    navLinks: normalizeFooterNavLinks(raw.navLinks, fallback.navLinks),
+    themesTitle: asText(raw.themesTitle, fallback.themesTitle),
+    themes: asList(raw.themes, fallback.themes),
+    copyright: asText(raw.copyright, fallback.copyright),
+    secureLabel: asText(raw.secureLabel, fallback.secureLabel),
+    subscribersLinkLabel: asText(raw.subscribersLinkLabel, fallback.subscribersLinkLabel),
+    subscribersLinkPath: asFooterPath(raw.subscribersLinkPath, fallback.subscribersLinkPath),
+  }
+}
+
 const normalizePlan = (value: unknown, fallback: PlanSettings): PlanSettings => {
   if (!value || typeof value !== 'object') return fallback
   const raw = value as Record<string, unknown>
@@ -261,6 +355,7 @@ const fromRecord = (r: any): SiteSettings => {
     planFree: normalizePlan(r.plan_free, d.planFree),
     planPro: normalizePlan(r.plan_pro, d.planPro),
     planMentoria: normalizePlan(r.plan_mentoria, d.planMentoria),
+    footer: normalizeFooter(r.footer, d.footer),
     profilePhotoUrl: r.profile_photo ? pb.files.getUrl(r, r.profile_photo) : DEFAULT_PHOTO_URL,
   }
 }
@@ -297,6 +392,7 @@ export const SiteSettingsService = {
     body.append('plan_free', JSON.stringify(settings.planFree))
     body.append('plan_pro', JSON.stringify(settings.planPro))
     body.append('plan_mentoria', JSON.stringify(settings.planMentoria))
+    body.append('footer', JSON.stringify(settings.footer))
     if (photo) body.append('profile_photo', photo)
 
     if (id) {
