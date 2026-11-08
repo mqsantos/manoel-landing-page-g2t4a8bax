@@ -41,29 +41,29 @@ export const Navbar: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         {/* Brand / Logo */}
         <Link to="/" className="flex items-center gap-3 group">
           <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold tracking-tight shadow-md group-hover:bg-blue-900 transition-colors">
             MS
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-slate-900 dark:text-white tracking-tight text-base sm:text-lg">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="font-bold text-slate-900 dark:text-white tracking-tight text-base sm:text-lg truncate">
                 Manoel Santos
               </span>
-              <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">
+              <span className="hidden sm:inline-flex shrink-0 items-center whitespace-nowrap px-2 py-0.5 rounded-full text-[10px] leading-none font-semibold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">
                 Lean PD & AI
               </span>
             </div>
-            <p className="text-xs text-muted-foreground hidden sm:block">
+            <p className="text-xs text-muted-foreground hidden sm:block truncate">
               Systems Engineering & Lean Transformation
             </p>
           </div>
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-6 shrink-0">
           {navLinks.map((link) => (
             <Link
               key={link.path}
