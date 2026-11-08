@@ -53,7 +53,7 @@ export const Navbar: React.FC = () => {
                 Manoel Santos
               </span>
               <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">
-                Boeing
+                Lean PD & AI
               </span>
             </div>
             <p className="text-xs text-muted-foreground hidden sm:block">
