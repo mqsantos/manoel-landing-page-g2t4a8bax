@@ -171,9 +171,13 @@ export default function Plans() {
   }
 
   // Ordem dos cartões: a que o dono configurou; filtro os planos ocultos/removidos.
+  // Plano sem o campo "visible" definido (valor ausente/malformado) = visível (fallback seguro).
   const planEntries = settings.plansOrder
     .map((key) => ({ key, plan: settings[PLAN_FIELD[key]] as PlanSettings | null }))
-    .filter((entry): entry is { key: PlanKey; plan: PlanSettings } => !!entry.plan)
+    .filter(
+      (entry): entry is { key: PlanKey; plan: PlanSettings } =>
+        !!entry.plan && entry.plan.visible !== false,
+    )
     .map((entry) => ({ ...entry, ...PLAN_CARD_STYLES[entry.key] }))
 
   return (
