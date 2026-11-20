@@ -73,6 +73,74 @@ const PLAN_CARD_STYLES: Record<
   },
 }
 
+/** Linhas do comparativo detalhado de recursos. */
+type ComparisonCell = {
+  cls: string
+  text: (t: (key: string) => string) => string
+}
+
+type ComparisonRow = {
+  key: string
+  // Valores por chave de plano; ausente = "—"
+  cells: Partial<Record<PlanKey, ComparisonCell>>
+}
+
+const FEATURE_MENTOR = 'text-indigo-600 font-semibold'
+const FEATURE_PRO = 'text-blue-600 font-semibold'
+const FEATURE_FREE = 'text-slate-400'
+
+const COMPARISON_ROWS: ComparisonRow[] = [
+  {
+    key: 'artigos',
+    cells: {
+      gratis: { cls: '', text: (t) => t('plans.cmp.ilimitado') },
+      pro: { cls: '', text: (t) => t('plans.cmp.ilimitado') },
+      mentoria: { cls: '', text: (t) => t('plans.cmp.ilimitado') },
+    },
+  },
+  {
+    key: 'podcast',
+    cells: {
+      gratis: { cls: '', text: (t) => t('plans.cmp.episodiosPublicos') },
+      pro: { cls: '', text: (t) => t('plans.cmp.todosExclusivos') },
+      mentoria: { cls: '', text: (t) => t('plans.cmp.todosExclusivos') },
+    },
+  },
+  {
+    key: 'masterclasses',
+    cells: {
+      gratis: { cls: FEATURE_FREE, text: (t) => t('plans.cmp.previa') },
+      pro: { cls: FEATURE_PRO, text: (t) => t('plans.cmp.acessoCompleto') },
+      mentoria: { cls: FEATURE_MENTOR, text: (t) => t('plans.cmp.acessoCompleto') },
+    },
+  },
+  {
+    key: 'downloads',
+    cells: {
+      gratis: { cls: FEATURE_FREE, text: (t) => t('plans.cmp.previa') },
+      pro: { cls: FEATURE_PRO, text: (t) => t('plans.cmp.ilimitado') },
+      mentoria: { cls: FEATURE_MENTOR, text: (t) => t('plans.cmp.ilimitado') },
+    },
+  },
+  {
+    key: 'sessoes',
+    cells: {
+      pro: { cls: FEATURE_FREE, text: (t) => t('plans.cmp.nao') },
+      mentoria: { cls: FEATURE_MENTOR, text: (t) => t('plans.cmp.incluso') },
+    },
+  },
+]
+
+/** Coluna do comparativo: estilo herdado do card do plano + rótulo curto. */
+const COMPARISON_COLUMNS: Record<PlanKey, { thClass: string; labelKey: string }> = {
+  gratis: { thClass: 'font-semibold text-slate-700 text-center', labelKey: 'plans.planoGratuito' },
+  pro: { thClass: 'font-semibold text-blue-700 text-center', labelKey: 'plans.planoProMensal' },
+  mentoria: {
+    thClass: 'font-semibold text-indigo-700 text-center',
+    labelKey: 'plans.planoMentoria',
+  },
+}
+
 /** Renderiza **negrito** simples dentro do texto de um benefício. */
 const BenefitText = ({ text }: { text: string }) => {
   const parts = text.split(/\*\*(.+?)\*\*/g)
@@ -265,65 +333,49 @@ export default function Plans() {
         )}
       </div>
 
-      {/* Comparison Table */}
-      <div className="bg-slate-50 rounded-2xl border border-border p-6 sm:p-10 space-y-6">
-        <h3 className="text-xl font-bold text-slate-900 text-center">
-          Comparativo Detalhado de Recursos
-        </h3>
+      {/* Comparison Table — apenas as colunas dos planos visíveis, na mesma ordem dos cards */}
+      {planEntries.length > 0 && (
+        <div className="bg-slate-50 rounded-2xl border border-border p-6 sm:p-10 space-y-6">
+          <h3 className="text-xl font-bold text-slate-900 text-center">{t('plans.cmp.titulo')}</h3>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs sm:text-sm text-left">
-            <thead>
-              <tr className="border-b border-slate-200">
-                <th className="py-3 px-4 font-semibold text-slate-900">Recurso / Conteúdo</th>
-                <th className="py-3 px-4 font-semibold text-slate-700 text-center">Grátis</th>
-                <th className="py-3 px-4 font-semibold text-blue-700 text-center">Membro Pro</th>
-                <th className="py-3 px-4 font-semibold text-indigo-700 text-center">Mentoria</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200/60 text-slate-600">
-              <tr>
-                <td className="py-3 px-4 font-medium text-slate-900">Artigos abertos e ensaios</td>
-                <td className="py-3 px-4 text-center">✓ Ilimitado</td>
-                <td className="py-3 px-4 text-center">✓ Ilimitado</td>
-                <td className="py-3 px-4 text-center">✓ Ilimitado</td>
-              </tr>
-              <tr>
-                <td className="py-3 px-4 font-medium text-slate-900">Podcast em áudio</td>
-                <td className="py-3 px-4 text-center">Episódios públicos</td>
-                <td className="py-3 px-4 text-center">Todos + exclusivos</td>
-                <td className="py-3 px-4 text-center">Todos + exclusivos</td>
-              </tr>
-              <tr>
-                <td className="py-3 px-4 font-medium text-slate-900">Masterclasses em vídeo</td>
-                <td className="py-3 px-4 text-center text-slate-400">Prévia</td>
-                <td className="py-3 px-4 text-center text-blue-600 font-semibold">
-                  ✓ Acesso completo
-                </td>
-                <td className="py-3 px-4 text-center text-indigo-600 font-semibold">
-                  ✓ Acesso completo
-                </td>
-              </tr>
-              <tr>
-                <td className="py-3 px-4 font-medium text-slate-900">
-                  Downloads de frameworks em PDF (A3)
-                </td>
-                <td className="py-3 px-4 text-center text-slate-400">Prévia</td>
-                <td className="py-3 px-4 text-center text-blue-600 font-semibold">✓ Ilimitado</td>
-                <td className="py-3 px-4 text-center text-indigo-600 font-semibold">✓ Ilimitado</td>
-              </tr>
-              <tr>
-                <td className="py-3 px-4 font-medium text-slate-900">
-                  Sessões 1-on-1 com Manoel Santos
-                </td>
-                <td className="py-3 px-4 text-center text-slate-400">—</td>
-                <td className="py-3 px-4 text-center text-slate-400">—</td>
-                <td className="py-3 px-4 text-center text-indigo-600 font-semibold">✓ Incluso</td>
-              </tr>
-            </tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs sm:text-sm text-left">
+              <thead>
+                <tr className="border-b border-slate-200">
+                  <th className="py-3 px-4 font-semibold text-slate-900">
+                    {t('plans.cmp.recurso')}
+                  </th>
+                  {planEntries.map(({ key, plan }) => (
+                    <th key={key} className={`py-3 px-4 ${COMPARISON_COLUMNS[key].thClass}`}>
+                      {plan.name || t(COMPARISON_COLUMNS[key].labelKey)}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200/60 text-slate-600">
+                {COMPARISON_ROWS.map((row) => (
+                  <tr key={row.key}>
+                    <td className="py-3 px-4 font-medium text-slate-900">
+                      {t(`plans.cmp.${row.key}`)}
+                    </td>
+                    {planEntries.map(({ key }) => {
+                      const cell = row.cells[key]
+                      return (
+                        <td
+                          key={key}
+                          className={`py-3 px-4 text-center ${cell?.cls ?? FEATURE_FREE}`}
+                        >
+                          {cell ? cell.text(t) : t('plans.cmp.nao')}
+                        </td>
+                      )
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Interest Registration Modal */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
