@@ -210,7 +210,7 @@ export default function SiteSettingsEditor() {
                 {settings.profilePhotoUrl && (
                   <img
                     src={settings.profilePhotoUrl}
-                    alt="Foto atual"
+                    alt={t('editor.fotoAtual')}
                     className="w-16 h-16 rounded-lg object-cover border border-slate-200 mt-1"
                   />
                 )}

@@ -7,13 +7,14 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent } from '@/components/ui/card'
 import { LinesEditor } from '@/components/owner/SettingsFormFields'
 import { SiteSettingsService } from '@/services/siteSettingsService'
+import { useLanguage } from '@/lib/i18n'
 import { Eye, EyeOff, ChevronDown, ChevronUp, Trash2, RotateCcw } from 'lucide-react'
 import type { PlanKey, PlanSettings, SiteSettings } from '@/services/siteSettingsService'
 
-const PLAN_LABELS: Record<PlanKey, string> = {
-  gratis: 'Plano Grátis',
-  pro: 'Plano Pro (Membro)',
-  mentoria: 'Plano Mentoria',
+const PLAN_LABEL_KEYS: Record<PlanKey, string> = {
+  gratis: 'plansEditor.planoGratis',
+  pro: 'plansEditor.planoPro',
+  mentoria: 'plansEditor.planoMentoria',
 }
 
 const PLAN_FIELD: Record<PlanKey, 'planFree' | 'planPro' | 'planMentoria'> = {
@@ -46,16 +47,12 @@ function PlanCard({
   onMove: (delta: number) => void
   onRemove: () => void
 }) {
+  const { t } = useLanguage()
   const visible = plan.visible !== false
-  const label = PLAN_LABELS[planKey]
+  const label = t(PLAN_LABEL_KEYS[planKey])
 
   const confirmRemove = () => {
-    if (
-      window.confirm(
-        `Remover o ${label} do site? Ele desaparece da página "Planos & Assinatura" depois que você salvar. ` +
-          `(A mudança só vale após clicar em "Salvar Alterações"; dá para trazer de volta com "Adicionar plano".)`,
-      )
-    ) {
+    if (window.confirm(t('plansEditor.confirmarRemover', { plano: label }))) {
       onRemove()
     }
   }
@@ -74,7 +71,7 @@ function PlanCard({
               variant="ghost"
               size="icon"
               className="h-8 w-8 text-slate-400 hover:text-slate-700"
-              title="Mover este plano para cima"
+              title={t('plansEditor.moverCima')}
               onClick={() => onMove(-1)}
               disabled={isFirst}
             >
@@ -85,7 +82,7 @@ function PlanCard({
               variant="ghost"
               size="icon"
               className="h-8 w-8 text-slate-400 hover:text-slate-700"
-              title="Mover este plano para baixo"
+              title={t('plansEditor.moverBaixo')}
               onClick={() => onMove(1)}
               disabled={isLast}
             >
@@ -99,7 +96,7 @@ function PlanCard({
               onClick={confirmRemove}
             >
               <Trash2 className="w-3.5 h-3.5" />
-              Remover plano
+              {t('plansEditor.remover')}
             </Button>
           </div>
         </div>
@@ -118,19 +115,17 @@ function PlanCard({
             )}
             <div>
               <p className="text-xs font-semibold text-slate-800">
-                {visible ? 'Plano visível no site' : 'Plano oculto no site'}
+                {visible ? t('plansEditor.visivel') : t('plansEditor.oculto')}
               </p>
               <p className="text-[10px] text-slate-500">
-                {visible
-                  ? 'Aparece na página "Planos & Assinatura".'
-                  : 'Desligado: some da página Planos quando você salvar.'}
+                {visible ? t('plansEditor.visivelDesc') : t('plansEditor.ocultoDesc')}
               </p>
             </div>
           </div>
           <Switch
             checked={visible}
             onCheckedChange={(checked) => onChange({ ...plan, visible: checked })}
-            aria-label={`Alternar visibilidade do ${label}`}
+            aria-label={t('plansEditor.toggleAria', { plano: label })}
           />
         </div>
 
@@ -138,7 +133,7 @@ function PlanCard({
         <div className="space-y-3">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold">Nome do plano</Label>
+              <Label className="text-xs font-semibold">{t('plansEditor.nome')}</Label>
               <Input
                 value={plan.name}
                 onChange={(e) => onChange({ ...plan, name: e.target.value })}
@@ -146,17 +141,17 @@ function PlanCard({
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold">Selo (badge) — opcional</Label>
+              <Label className="text-xs font-semibold">{t('plansEditor.selo')}</Label>
               <Input
                 value={plan.badge}
                 onChange={(e) => onChange({ ...plan, badge: e.target.value })}
                 className="text-xs"
-                placeholder="Ex: Completo, Vagas Limitadas"
+                placeholder={t('plansEditor.seloPlaceholder')}
               />
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold">Descrição curta</Label>
+            <Label className="text-xs font-semibold">{t('plansEditor.descricao')}</Label>
             <Textarea
               value={plan.description}
               onChange={(e) => onChange({ ...plan, description: e.target.value })}
@@ -166,25 +161,25 @@ function PlanCard({
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold">Preço</Label>
+              <Label className="text-xs font-semibold">{t('plansEditor.preco')}</Label>
               <Input
                 value={plan.price}
                 onChange={(e) => onChange({ ...plan, price: e.target.value })}
                 className="text-xs"
-                placeholder="Ex: R$ 59"
+                placeholder={t('plansEditor.precoPlaceholder')}
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold">Nota ao lado do preço</Label>
+              <Label className="text-xs font-semibold">{t('plansEditor.precoNota')}</Label>
               <Input
                 value={plan.priceNote}
                 onChange={(e) => onChange({ ...plan, priceNote: e.target.value })}
                 className="text-xs"
-                placeholder="Ex: / mês"
+                placeholder={t('plansEditor.precoNotaPlaceholder')}
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold">Observação abaixo do preço</Label>
+              <Label className="text-xs font-semibold">{t('plansEditor.nota')}</Label>
               <Input
                 value={plan.note}
                 onChange={(e) => onChange({ ...plan, note: e.target.value })}
@@ -193,7 +188,7 @@ function PlanCard({
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold">Texto do botão do plano</Label>
+            <Label className="text-xs font-semibold">{t('plansEditor.botao')}</Label>
             <Input
               value={plan.button}
               onChange={(e) => onChange({ ...plan, button: e.target.value })}
@@ -201,8 +196,8 @@ function PlanCard({
             />
           </div>
           <LinesEditor
-            label="Benefícios"
-            hint='Uma linha por benefício. Comece com "!" para marcar como não incluído (aparece com cadeado).'
+            label={t('plansEditor.beneficios')}
+            hint={t('plansEditor.beneficiosHint')}
             rows={plan.benefits}
             onChange={(benefits) => onChange({ ...plan, benefits })}
           />
@@ -223,6 +218,7 @@ export function PlansSettingsTab({
   settings: SiteSettings
   onPatch: (partial: Partial<SiteSettings>) => void
 }) {
+  const { t } = useLanguage()
   const ALL_KEYS: PlanKey[] = ['gratis', 'pro', 'mentoria']
 
   // Ordem segura: só chaves conhecidas (e, por garantia, todas as 3 presentes).
@@ -257,9 +253,9 @@ export function PlansSettingsTab({
     <div className="space-y-6">
       {/* Cabeçalho da página pública */}
       <div className="space-y-3">
-        <h3 className="text-sm font-bold text-slate-900">Cabeçalho da página</h3>
+        <h3 className="text-sm font-bold text-slate-900">{t('plansEditor.cabecalho')}</h3>
         <div className="space-y-1.5">
-          <Label className="text-xs font-semibold">Selo (badge)</Label>
+          <Label className="text-xs font-semibold">{t('plansEditor.seloSimples')}</Label>
           <Input
             value={settings.plansHeader.badge}
             onChange={(e) =>
@@ -269,7 +265,7 @@ export function PlansSettingsTab({
           />
         </div>
         <div className="space-y-1.5">
-          <Label className="text-xs font-semibold">Título</Label>
+          <Label className="text-xs font-semibold">{t('plansEditor.titulo')}</Label>
           <Input
             value={settings.plansHeader.title}
             onChange={(e) =>
@@ -279,7 +275,7 @@ export function PlansSettingsTab({
           />
         </div>
         <div className="space-y-1.5">
-          <Label className="text-xs font-semibold">Texto de apresentação</Label>
+          <Label className="text-xs font-semibold">{t('plansEditor.textoApresentacao')}</Label>
           <Textarea
             value={settings.plansHeader.text}
             onChange={(e) =>
@@ -294,7 +290,7 @@ export function PlansSettingsTab({
       {/* Cartões dos planos */}
       <div className="pt-2 border-t border-slate-100 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h3 className="text-sm font-bold text-slate-900">Planos de assinatura</h3>
+          <h3 className="text-sm font-bold text-slate-900">{t('plansEditor.tituloSecao')}</h3>
           {removedCount > 0 && (
             <Button
               type="button"
@@ -304,15 +300,11 @@ export function PlansSettingsTab({
               onClick={addPlan}
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              Adicionar plano
+              {t('plansEditor.adicionar')}
             </Button>
           )}
         </div>
-        <p className="text-[11px] text-slate-500">
-          Cada plano é um bloco. Use o switch verde para mostrar ou ocultar o plano no site, as
-          setas ↑↓ para reordenar e "Remover plano" para tirá-lo da página (com confirmação). Tudo
-          só vale depois de clicar em "Salvar Alterações".
-        </p>
+        <p className="text-[11px] text-slate-500">{t('plansEditor.instrucoes')}</p>
         <div className="space-y-4">
           {order.map((key, i) => {
             const plan = planOf(key)

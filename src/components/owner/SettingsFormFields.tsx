@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent } from '@/components/ui/card'
+import { useLanguage } from '@/lib/i18n'
 
 /** Uma lista de linhas de texto editáveis (adicionar, editar, remover, reordenar). */
 export function LinesEditor({
@@ -18,6 +19,7 @@ export function LinesEditor({
   rows: string[]
   onChange: (rows: string[]) => void
 }) {
+  const { t } = useLanguage()
   const update = (i: number, value: string) => {
     const next = [...rows]
     next[i] = value
@@ -43,7 +45,7 @@ export function LinesEditor({
           className="h-7 text-[11px]"
           onClick={() => onChange([...rows, ''])}
         >
-          + Adicionar linha
+          {t('form.adicionarLinha')}
         </Button>
       </div>
       {hint && <p className="text-[11px] text-slate-500">{hint}</p>}
@@ -54,14 +56,14 @@ export function LinesEditor({
               value={row}
               onChange={(e) => update(i, e.target.value)}
               className="text-xs"
-              placeholder={`Linha ${i + 1}`}
+              placeholder={t('form.linha', { n: i + 1 })}
             />
             <Button
               type="button"
               variant="ghost"
               size="icon"
               className="h-8 w-8 flex-shrink-0 text-slate-400 hover:text-slate-700"
-              title="Mover para cima"
+              title={t('form.moverCima')}
               onClick={() => move(i, -1)}
               disabled={i === 0}
             >
@@ -72,7 +74,7 @@ export function LinesEditor({
               variant="ghost"
               size="icon"
               className="h-8 w-8 flex-shrink-0 text-slate-400 hover:text-slate-700"
-              title="Mover para baixo"
+              title={t('form.moverBaixo')}
               onClick={() => move(i, 1)}
               disabled={i === rows.length - 1}
             >
@@ -83,7 +85,7 @@ export function LinesEditor({
               variant="ghost"
               size="icon"
               className="h-8 w-8 flex-shrink-0 text-rose-500 hover:text-rose-700"
-              title="Remover linha"
+              title={t('form.removerLinha')}
               onClick={() => remove(i)}
             >
               ✕
@@ -107,12 +109,13 @@ export function SkillEditor({
   onChange: (next: { title: string; description: string; bullets: string[] }) => void
   onRemove: () => void
 }) {
+  const { t } = useLanguage()
   return (
     <Card className="border-slate-200">
       <CardContent className="p-4 space-y-3">
         <div className="flex items-center justify-between">
           <Badge variant="secondary" className="bg-slate-100 text-slate-700 text-[11px]">
-            Cartão {index + 1}
+            {t('form.cartao', { n: index + 1 })}
           </Badge>
           <Button
             type="button"
@@ -121,30 +124,30 @@ export function SkillEditor({
             className="h-7 text-[11px] text-rose-500 hover:text-rose-700"
             onClick={onRemove}
           >
-            Remover cartão
+            {t('form.removerCartao')}
           </Button>
         </div>
         <div className="space-y-1.5">
-          <Label className="text-xs font-semibold">Título</Label>
+          <Label className="text-xs font-semibold">{t('form.titulo')}</Label>
           <Input
             value={skill.title}
             onChange={(e) => onChange({ ...skill, title: e.target.value })}
             className="text-xs"
-            placeholder="Ex: Embraer & Boeing"
+            placeholder={t('form.tituloPlaceholder')}
           />
         </div>
         <div className="space-y-1.5">
-          <Label className="text-xs font-semibold">Descrição</Label>
+          <Label className="text-xs font-semibold">{t('form.descricao')}</Label>
           <Textarea
             value={skill.description}
             onChange={(e) => onChange({ ...skill, description: e.target.value })}
             className="text-xs"
             rows={3}
-            placeholder="Resumo da experiência..."
+            placeholder={t('form.descricaoPlaceholder')}
           />
         </div>
         <LinesEditor
-          label="Bullets"
+          label={t('form.bullets')}
           rows={skill.bullets}
           onChange={(bullets) => onChange({ ...skill, bullets })}
         />
