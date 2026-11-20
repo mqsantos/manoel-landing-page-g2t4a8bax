@@ -18,6 +18,7 @@ const toItem = (r: any): ContentItem => ({
   description: r.description || '',
   description_en: r.description_en || '',
   content_body: r.content_body || '',
+  content_body_en: r.content_body_en || '',
   is_premium: !!r.is_premium,
   file: r.file ? pb.files.getUrl(r, r.file) : undefined,
   external_url: r.external_url || '',

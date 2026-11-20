@@ -11,6 +11,8 @@ export interface ContentItem {
   /** Descrição opcional em inglês. Vazia = usa a PT. */
   description_en?: string
   content_body?: string
+  /** Corpo opcional em inglês. Vazio = usa o PT. */
+  content_body_en?: string
   is_premium: boolean
   file?: string
   external_url?: string

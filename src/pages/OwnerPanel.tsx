@@ -65,6 +65,7 @@ export default function OwnerPanel() {
   const [titleEn, setTitleEn] = useState('')
   const [descriptionEn, setDescriptionEn] = useState('')
   const [contentBody, setContentBody] = useState('')
+  const [contentBodyEn, setContentBodyEn] = useState('')
   const [isPremium, setIsPremium] = useState(false)
   const [externalUrl, setExternalUrl] = useState('')
   const [durationOrReadTime, setDurationOrReadTime] = useState('')
@@ -101,6 +102,7 @@ export default function OwnerPanel() {
     setTitleEn('')
     setDescriptionEn('')
     setContentBody('')
+    setContentBodyEn('')
     setIsPremium(false)
     setExternalUrl('')
     setDurationOrReadTime('')
@@ -118,6 +120,7 @@ export default function OwnerPanel() {
     setTitleEn(item.title_en || '')
     setDescriptionEn(item.description_en || '')
     setContentBody(item.content_body || '')
+    setContentBodyEn(item.content_body_en || '')
     setIsPremium(item.is_premium)
     setExternalUrl(item.external_url || '')
     setDurationOrReadTime(item.duration_or_read_time || '')
@@ -163,6 +166,7 @@ export default function OwnerPanel() {
       formData.append('title_en', titleEn.trim())
       formData.append('description_en', descriptionEn.trim())
       formData.append('content_body', contentBody.trim())
+      formData.append('content_body_en', contentBodyEn.trim())
       formData.append('is_premium', String(isPremium))
       formData.append('external_url', externalUrl.trim())
       formData.append('duration_or_read_time', durationOrReadTime.trim())
@@ -503,17 +507,34 @@ export default function OwnerPanel() {
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="content-body" className="text-xs font-semibold">
-                {t('owner.labelCorpo')}
-              </Label>
-              <Textarea
-                id="content-body"
-                value={contentBody}
-                onChange={(e) => setContentBody(e.target.value)}
-                placeholder={t('owner.placeholderCorpo')}
-                rows={5}
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="content-body" className="text-xs font-semibold">
+                  {t('owner.labelCorpo')}
+                </Label>
+                <Textarea
+                  id="content-body"
+                  value={contentBody}
+                  onChange={(e) => setContentBody(e.target.value)}
+                  placeholder={t('owner.placeholderCorpo')}
+                  rows={5}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="content-body-en" className="text-xs font-semibold">
+                  {t('owner.labelCorpoEn')}
+                  <span className="ml-1 font-normal text-slate-400">({t('owner.opcionalEn')})</span>
+                </Label>
+                <Textarea
+                  id="content-body-en"
+                  lang="en"
+                  value={contentBodyEn}
+                  onChange={(e) => setContentBodyEn(e.target.value)}
+                  placeholder={t('owner.placeholderCorpoEn')}
+                  rows={5}
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

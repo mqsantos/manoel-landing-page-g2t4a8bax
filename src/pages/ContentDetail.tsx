@@ -330,17 +330,23 @@ export default function ContentDetail() {
         )}
 
         {/* ARTICLE / TEXT BODY */}
-        {content.content_body && (
-          <div className="bg-white rounded-2xl border border-border p-6 sm:p-10 space-y-6">
-            <h3 className="text-xl font-bold text-slate-900 pb-4 border-b border-slate-100 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-blue-600" />
-              {t('detail.textoIntegral')}
-            </h3>
-            <div className="prose prose-slate max-w-none text-slate-700 leading-relaxed space-y-4 whitespace-pre-wrap font-sans text-sm sm:text-base">
-              {content.content_body}
+        {(() => {
+          const body =
+            lang === 'en' && content.content_body_en
+              ? content.content_body_en
+              : content.content_body
+          return body ? (
+            <div className="bg-white rounded-2xl border border-border p-6 sm:p-10 space-y-6">
+              <h3 className="text-xl font-bold text-slate-900 pb-4 border-b border-slate-100 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-blue-600" />
+                {t('detail.textoIntegral')}
+              </h3>
+              <div className="prose prose-slate max-w-none text-slate-700 leading-relaxed space-y-4 whitespace-pre-wrap font-sans text-sm sm:text-base">
+                {body}
+              </div>
             </div>
-          </div>
-        )}
+          ) : null
+        })()}
       </div>
 
       {/* Author Card Footer */}
