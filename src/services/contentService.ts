@@ -8,6 +8,27 @@ import {
   ContentType,
 } from '@/types/database'
 
+/** Converte um registro cru da coleção contents para ContentItem. */
+const toItem = (r: any): ContentItem => ({
+  id: r.id,
+  title: r.title,
+  title_en: r.title_en || '',
+  slug: r.slug,
+  type: r.type,
+  description: r.description || '',
+  description_en: r.description_en || '',
+  content_body: r.content_body || '',
+  is_premium: !!r.is_premium,
+  file: r.file ? pb.files.getUrl(r, r.file) : undefined,
+  external_url: r.external_url || '',
+  cover_image: r.cover_image ? pb.files.getUrl(r, r.cover_image) : undefined,
+  duration_or_read_time: r.duration_or_read_time || '',
+  tags: r.tags || '',
+  views_count: r.views_count || 0,
+  created: r.created,
+  updated: r.updated,
+})
+
 export const ContentService = {
   async getAll(params?: {
     type?: ContentType | 'all'
@@ -38,45 +59,13 @@ export const ContentService = {
       sort: '-created',
     })
 
-    return records.map((r) => ({
-      id: r.id,
-      title: r.title,
-      slug: r.slug,
-      type: r.type,
-      description: r.description || '',
-      content_body: r.content_body || '',
-      is_premium: !!r.is_premium,
-      file: r.file ? pb.files.getUrl(r, r.file) : undefined,
-      external_url: r.external_url || '',
-      cover_image: r.cover_image ? pb.files.getUrl(r, r.cover_image) : undefined,
-      duration_or_read_time: r.duration_or_read_time || '',
-      tags: r.tags || '',
-      views_count: r.views_count || 0,
-      created: r.created,
-      updated: r.updated,
-    }))
+    return records.map(toItem)
   },
 
   async getBySlug(slug: string): Promise<ContentItem | null> {
     try {
       const r = await pb.collection('contents').getFirstListItem(`slug = "${slug}"`)
-      return {
-        id: r.id,
-        title: r.title,
-        slug: r.slug,
-        type: r.type,
-        description: r.description || '',
-        content_body: r.content_body || '',
-        is_premium: !!r.is_premium,
-        file: r.file ? pb.files.getUrl(r, r.file) : undefined,
-        external_url: r.external_url || '',
-        cover_image: r.cover_image ? pb.files.getUrl(r, r.cover_image) : undefined,
-        duration_or_read_time: r.duration_or_read_time || '',
-        tags: r.tags || '',
-        views_count: r.views_count || 0,
-        created: r.created,
-        updated: r.updated,
-      }
+      return toItem(r)
     } catch (_) {
       return null
     }
@@ -86,23 +75,7 @@ export const ContentService = {
     const records = await pb.collection('contents').getList(1, 4, {
       sort: '-created',
     })
-    return records.items.map((r) => ({
-      id: r.id,
-      title: r.title,
-      slug: r.slug,
-      type: r.type,
-      description: r.description || '',
-      content_body: r.content_body || '',
-      is_premium: !!r.is_premium,
-      file: r.file ? pb.files.getUrl(r, r.file) : undefined,
-      external_url: r.external_url || '',
-      cover_image: r.cover_image ? pb.files.getUrl(r, r.cover_image) : undefined,
-      duration_or_read_time: r.duration_or_read_time || '',
-      tags: r.tags || '',
-      views_count: r.views_count || 0,
-      created: r.created,
-      updated: r.updated,
-    }))
+    return records.items.map(toItem)
   },
 
   async create(data: FormData | Record<string, unknown>): Promise<void> {

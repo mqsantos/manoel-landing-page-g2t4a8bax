@@ -30,7 +30,7 @@ export default function ContentDetail() {
   const { user } = useAuth()
   const { toast } = useToast()
   const { settings } = useSiteSettings()
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
   const [content, setContent] = useState<ContentItem | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -155,11 +155,11 @@ export default function ContentDetail() {
         </div>
 
         <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
-          {content.title}
+          {lang === 'en' && content.title_en ? content.title_en : content.title}
         </h1>
 
         <p className="text-base sm:text-lg text-slate-600 leading-relaxed font-normal">
-          {content.description}
+          {lang === 'en' && content.description_en ? content.description_en : content.description}
         </p>
 
         {content.tags && (

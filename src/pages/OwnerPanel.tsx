@@ -62,6 +62,8 @@ export default function OwnerPanel() {
   const [slug, setSlug] = useState('')
   const [type, setType] = useState<ContentType>('article')
   const [description, setDescription] = useState('')
+  const [titleEn, setTitleEn] = useState('')
+  const [descriptionEn, setDescriptionEn] = useState('')
   const [contentBody, setContentBody] = useState('')
   const [isPremium, setIsPremium] = useState(false)
   const [externalUrl, setExternalUrl] = useState('')
@@ -96,6 +98,8 @@ export default function OwnerPanel() {
     setSlug('')
     setType('article')
     setDescription('')
+    setTitleEn('')
+    setDescriptionEn('')
     setContentBody('')
     setIsPremium(false)
     setExternalUrl('')
@@ -111,6 +115,8 @@ export default function OwnerPanel() {
     setSlug(item.slug)
     setType(item.type)
     setDescription(item.description)
+    setTitleEn(item.title_en || '')
+    setDescriptionEn(item.description_en || '')
     setContentBody(item.content_body || '')
     setIsPremium(item.is_premium)
     setExternalUrl(item.external_url || '')
@@ -154,6 +160,8 @@ export default function OwnerPanel() {
       formData.append('slug', slug.trim())
       formData.append('type', type)
       formData.append('description', description.trim())
+      formData.append('title_en', titleEn.trim())
+      formData.append('description_en', descriptionEn.trim())
       formData.append('content_body', contentBody.trim())
       formData.append('is_premium', String(isPremium))
       formData.append('external_url', externalUrl.trim())
@@ -384,8 +392,8 @@ export default function OwnerPanel() {
           </DialogHeader>
 
           <form onSubmit={handleSaveContent} className="space-y-4 pt-2">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="sm:col-span-2 space-y-1.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
                 <Label htmlFor="content-title" className="text-xs font-semibold">
                   {t('owner.labelTituloConteudo')}
                 </Label>
@@ -398,6 +406,22 @@ export default function OwnerPanel() {
                 />
               </div>
 
+              <div className="space-y-1.5">
+                <Label htmlFor="content-title-en" className="text-xs font-semibold">
+                  {t('owner.labelTituloEn')}
+                  <span className="ml-1 font-normal text-slate-400">({t('owner.opcionalEn')})</span>
+                </Label>
+                <Input
+                  id="content-title-en"
+                  lang="en"
+                  value={titleEn}
+                  onChange={(e) => setTitleEn(e.target.value)}
+                  placeholder={t('owner.placeholderTituloEn')}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="content-type" className="text-xs font-semibold">
                   {t('owner.labelFormato')}
@@ -449,17 +473,34 @@ export default function OwnerPanel() {
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="content-desc" className="text-xs font-semibold">
-                {t('owner.labelResumo')}
-              </Label>
-              <Textarea
-                id="content-desc"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder={t('owner.placeholderResumo')}
-                rows={2}
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="content-desc" className="text-xs font-semibold">
+                  {t('owner.labelResumo')}
+                </Label>
+                <Textarea
+                  id="content-desc"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder={t('owner.placeholderResumo')}
+                  rows={2}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="content-desc-en" className="text-xs font-semibold">
+                  {t('owner.labelResumoEn')}
+                  <span className="ml-1 font-normal text-slate-400">({t('owner.opcionalEn')})</span>
+                </Label>
+                <Textarea
+                  id="content-desc-en"
+                  lang="en"
+                  value={descriptionEn}
+                  onChange={(e) => setDescriptionEn(e.target.value)}
+                  placeholder={t('owner.placeholderResumoEn')}
+                  rows={2}
+                />
+              </div>
             </div>
 
             <div className="space-y-1.5">

@@ -21,7 +21,7 @@ import { ContentItem, ContentType } from '@/types/database'
 import { useLanguage } from '@/lib/i18n'
 
 export default function ContentsList() {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
   const [searchParams, setSearchParams] = useSearchParams()
   const [contents, setContents] = useState<ContentItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -276,11 +276,11 @@ export default function ContentsList() {
                   </div>
 
                   <h3 className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors text-lg leading-snug">
-                    {item.title}
+                    {lang === 'en' && item.title_en ? item.title_en : item.title}
                   </h3>
 
                   <p className="text-xs text-slate-500 line-clamp-3 leading-relaxed">
-                    {item.description}
+                    {lang === 'en' && item.description_en ? item.description_en : item.description}
                   </p>
 
                   {item.tags && (

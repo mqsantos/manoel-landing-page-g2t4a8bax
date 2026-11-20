@@ -3,9 +3,13 @@ export type ContentType = 'video' | 'audio' | 'pdf' | 'article'
 export interface ContentItem {
   id: string
   title: string
+  /** Título opcional em inglês (etapa 2 do bilinguismo). Vazio = usa o PT. */
+  title_en?: string
   slug: string
   type: ContentType
   description: string
+  /** Descrição opcional em inglês. Vazia = usa a PT. */
+  description_en?: string
   content_body?: string
   is_premium: boolean
   file?: string

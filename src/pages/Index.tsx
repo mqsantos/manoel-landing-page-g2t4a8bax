@@ -49,7 +49,7 @@ const SKILL_ICONS = [Briefcase, Layers, Cpu]
 
 export default function Index() {
   const { settings } = useSiteSettings()
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
   const [featuredContents, setFeaturedContents] = useState<ContentItem[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -426,11 +426,13 @@ export default function Index() {
                     </div>
 
                     <h4 className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 text-base">
-                      {item.title}
+                      {lang === 'en' && item.title_en ? item.title_en : item.title}
                     </h4>
 
                     <p className="text-xs text-slate-500 line-clamp-3 leading-relaxed">
-                      {item.description}
+                      {lang === 'en' && item.description_en
+                        ? item.description_en
+                        : item.description}
                     </p>
                   </div>
 
