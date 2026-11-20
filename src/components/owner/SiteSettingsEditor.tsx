@@ -13,9 +13,11 @@ import { invalidateSiteSettings } from '@/hooks/use-site-settings'
 import { LinesEditor, SkillEditor } from '@/components/owner/SettingsFormFields'
 import { FooterSettingsTab } from '@/components/owner/FooterSettingsTab'
 import { PlansSettingsTab } from '@/components/owner/PlansSettingsTab'
+import { useLanguage } from '@/lib/i18n'
 
 export default function SiteSettingsEditor() {
   const { toast } = useToast()
+  const { t } = useLanguage()
   const [settings, setSettings] = useState<SiteSettings>(() => SiteSettingsService.defaults())
   const [recordId, setRecordId] = useState<string | null>(null)
   const [photo, setPhoto] = useState<File | null>(null)
@@ -48,8 +50,8 @@ export default function SiteSettingsEditor() {
   const handleSave = async () => {
     if (!settings.headline.trim() || !settings.bio.trim()) {
       toast({
-        title: 'Campos obrigatórios',
-        description: 'Preencha ao menos o título principal e a bio da página Início.',
+        title: t('owner.camposObrigatoriosTitulo'),
+        description: t('editor.camposObrigatoriosDesc'),
         variant: 'destructive',
       })
       return
@@ -63,14 +65,14 @@ export default function SiteSettingsEditor() {
       setHasUnsavedChanges(false)
       invalidateSiteSettings()
       toast({
-        title: 'Site atualizado!',
-        description: 'Os textos já estão no ar nas páginas Início e Planos.',
+        title: t('editor.siteAtualizadoTitulo'),
+        description: t('editor.siteAtualizadoDesc'),
       })
     } catch (err: any) {
       console.error(err)
       toast({
-        title: 'Erro ao salvar',
-        description: err?.message || 'Não foi possível salvar as configurações. Tente novamente.',
+        title: t('owner.erroSalvarTitulo'),
+        description: err?.message || t('owner.erroSalvarDesc'),
         variant: 'destructive',
       })
     } finally {
@@ -82,7 +84,7 @@ export default function SiteSettingsEditor() {
     return (
       <Card className="border-border">
         <CardContent className="py-12 text-center text-sm text-slate-500">
-          Carregando configurações do site...
+          {t('editor.carregandoConfig')}
         </CardContent>
       </Card>
     )
@@ -95,15 +97,12 @@ export default function SiteSettingsEditor() {
           <div>
             <div className="flex items-center gap-2">
               <Globe className="w-5 h-5 text-blue-600" />
-              <h2 className="text-lg font-bold text-slate-900">Editar site</h2>
+              <h2 className="text-lg font-bold text-slate-900">{t('editor.editarSite')}</h2>
               <Badge variant="secondary" className="bg-blue-100 text-blue-800 text-[11px]">
-                Início, Planos & Rodapé
+                {t('editor.badgeEscopo')}
               </Badge>
             </div>
-            <p className="text-xs text-slate-500 mt-1">
-              Edite os textos das páginas Início e Planos & Assinatura e do rodapé. Ao salvar, as
-              mudanças aparecem imediatamente no site.
-            </p>
+            <p className="text-xs text-slate-500 mt-1">{t('editor.descricao')}</p>
           </div>
           <Button
             onClick={handleSave}
@@ -111,27 +110,27 @@ export default function SiteSettingsEditor() {
             className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold gap-2"
           >
             <Save className="w-4 h-4" />
-            {saving ? 'Salvando...' : 'Salvar Alterações'}
+            {saving ? t('common.salvando') : t('owner.salvarAlteracoes')}
           </Button>
         </div>
 
         {hasUnsavedChanges && (
           <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
             <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-            Há alterações não salvas. Clique em "Salvar Alterações" para publicá-las no site.
+            {t('editor.alteracoesNaoSalvas')}
           </div>
         )}
 
         <Tabs defaultValue="inicio" className="w-full">
           <TabsList className="grid w-full grid-cols-3 mb-4">
             <TabsTrigger value="inicio" className="text-xs">
-              Página Início
+              {t('editor.abaInicio')}
             </TabsTrigger>
             <TabsTrigger value="planos" className="text-xs">
-              Página Planos
+              {t('editor.abaPlanos')}
             </TabsTrigger>
             <TabsTrigger value="rodape" className="text-xs">
-              Rodapé
+              {t('editor.abaRodape')}
             </TabsTrigger>
           </TabsList>
 
@@ -139,10 +138,10 @@ export default function SiteSettingsEditor() {
           <TabsContent value="inicio" className="space-y-6">
             {/* Título principal */}
             <div className="space-y-3">
-              <h3 className="text-sm font-bold text-slate-900">Título principal (hero)</h3>
+              <h3 className="text-sm font-bold text-slate-900">{t('editor.tituloHero')}</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold">Primeira parte</Label>
+                  <Label className="text-xs font-semibold">{t('editor.primeiraParte')}</Label>
                   <Input
                     value={settings.headline}
                     onChange={(e) => patch({ headline: e.target.value })}
@@ -150,7 +149,7 @@ export default function SiteSettingsEditor() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold">Parte destacada (gradiente)</Label>
+                  <Label className="text-xs font-semibold">{t('editor.parteDestacada')}</Label>
                   <Input
                     value={settings.headlineHighlight}
                     onChange={(e) => patch({ headlineHighlight: e.target.value })}
@@ -159,7 +158,7 @@ export default function SiteSettingsEditor() {
                 </div>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Subtítulo</Label>
+                <Label className="text-xs font-semibold">{t('editor.subtitulo')}</Label>
                 <Input
                   value={settings.subBio}
                   onChange={(e) => patch({ subBio: e.target.value })}
@@ -170,9 +169,7 @@ export default function SiteSettingsEditor() {
 
             {/* Bio */}
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold">
-                Bio (pode usar **negrito** nas palavras-chave)
-              </Label>
+              <Label className="text-xs font-semibold">{t('editor.bioLabel')}</Label>
               <Textarea
                 value={settings.bio}
                 onChange={(e) => patch({ bio: e.target.value })}
@@ -183,10 +180,10 @@ export default function SiteSettingsEditor() {
 
             {/* Foto, cargo e empresa */}
             <div className="space-y-3 pt-2 border-t border-slate-100">
-              <h3 className="text-sm font-bold text-slate-900">Cartão de perfil</h3>
+              <h3 className="text-sm font-bold text-slate-900">{t('editor.cartaoPerfil')}</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold">Cargo</Label>
+                  <Label className="text-xs font-semibold">{t('editor.cargo')}</Label>
                   <Input
                     value={settings.heroRole}
                     onChange={(e) => patch({ heroRole: e.target.value })}
@@ -194,7 +191,7 @@ export default function SiteSettingsEditor() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold">Empresa</Label>
+                  <Label className="text-xs font-semibold">{t('editor.empresa')}</Label>
                   <Input
                     value={settings.heroCompany}
                     onChange={(e) => patch({ heroCompany: e.target.value })}
@@ -203,7 +200,7 @@ export default function SiteSettingsEditor() {
                 </div>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Foto de perfil</Label>
+                <Label className="text-xs font-semibold">{t('editor.fotoPerfil')}</Label>
                 <Input
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
@@ -223,7 +220,7 @@ export default function SiteSettingsEditor() {
             {/* Credenciais rápidas */}
             <div className="pt-2 border-t border-slate-100">
               <LinesEditor
-                label="Credenciais rápidas (badges do hero)"
+                label={t('editor.credenciaisRapidas')}
                 rows={settings.credentials}
                 onChange={(credentials) => patch({ credentials })}
               />
@@ -232,7 +229,7 @@ export default function SiteSettingsEditor() {
             {/* Destaques */}
             <div className="pt-2 border-t border-slate-100">
               <LinesEditor
-                label="Destaques (checkmarks do cartão)"
+                label={t('editor.destaques')}
                 rows={settings.highlights}
                 onChange={(highlights) => patch({ highlights })}
               />
@@ -241,11 +238,11 @@ export default function SiteSettingsEditor() {
             {/* Botões do hero */}
             <div className="pt-2 border-t border-slate-100">
               <h3 className="text-sm font-bold text-slate-900 mb-2">
-                Botões de ação da página Início
+                {t('editor.botoesAcaoInicio')}
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold">Botão principal</Label>
+                  <Label className="text-xs font-semibold">{t('editor.botaoPrincipal')}</Label>
                   <Input
                     value={settings.ctaButtons.primary}
                     onChange={(e) =>
@@ -255,7 +252,7 @@ export default function SiteSettingsEditor() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold">Botão secundário</Label>
+                  <Label className="text-xs font-semibold">{t('editor.botaoSecundario')}</Label>
                   <Input
                     value={settings.ctaButtons.secondary}
                     onChange={(e) =>
@@ -270,7 +267,7 @@ export default function SiteSettingsEditor() {
             {/* Skills */}
             <div className="pt-2 border-t border-slate-100 space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-slate-900">Cartões de skills</h3>
+                <h3 className="text-sm font-bold text-slate-900">{t('editor.cartoesSkills')}</h3>
                 <Button
                   type="button"
                   variant="outline"
@@ -282,7 +279,7 @@ export default function SiteSettingsEditor() {
                     })
                   }
                 >
-                  + Adicionar cartão
+                  {t('editor.adicionarCartao')}
                 </Button>
               </div>
               {settings.skills.map((skill, i) => (
@@ -302,11 +299,9 @@ export default function SiteSettingsEditor() {
 
             {/* Banner CTA */}
             <div className="pt-2 border-t border-slate-100 space-y-3">
-              <h3 className="text-sm font-bold text-slate-900">
-                Banner de assinatura (final da página)
-              </h3>
+              <h3 className="text-sm font-bold text-slate-900">{t('editor.bannerAssinatura')}</h3>
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Selo do banner</Label>
+                <Label className="text-xs font-semibold">{t('editor.seloBanner')}</Label>
                 <Input
                   value={settings.ctaBanner.badge}
                   onChange={(e) =>
@@ -316,7 +311,7 @@ export default function SiteSettingsEditor() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Título do banner</Label>
+                <Label className="text-xs font-semibold">{t('editor.tituloBanner')}</Label>
                 <Input
                   value={settings.ctaBanner.title}
                   onChange={(e) =>
@@ -326,7 +321,7 @@ export default function SiteSettingsEditor() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Texto do banner</Label>
+                <Label className="text-xs font-semibold">{t('editor.textoBanner')}</Label>
                 <Textarea
                   value={settings.ctaBanner.text}
                   onChange={(e) =>
@@ -338,7 +333,9 @@ export default function SiteSettingsEditor() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold">Botão principal do banner</Label>
+                  <Label className="text-xs font-semibold">
+                    {t('editor.botaoPrincipalBanner')}
+                  </Label>
                   <Input
                     value={settings.ctaBanner.buttonPrimary}
                     onChange={(e) =>
@@ -350,7 +347,9 @@ export default function SiteSettingsEditor() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold">Botão secundário do banner</Label>
+                  <Label className="text-xs font-semibold">
+                    {t('editor.botaoSecundarioBanner')}
+                  </Label>
                   <Input
                     value={settings.ctaBanner.buttonSecondary}
                     onChange={(e) =>

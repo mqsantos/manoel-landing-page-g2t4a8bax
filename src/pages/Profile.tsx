@@ -19,11 +19,13 @@ import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/context/AuthContext'
 import { useToast } from '@/hooks/use-toast'
 import pb from '@/lib/pocketbase/client'
+import { useLanguage } from '@/lib/i18n'
 
 export default function Profile() {
   const { user, isOwner, logout, refreshUser, requestVerification } = useAuth()
   const navigate = useNavigate()
   const { toast } = useToast()
+  const { t } = useLanguage()
 
   const [name, setName] = useState(user?.name || '')
   const [saving, setSaving] = useState(false)
@@ -32,10 +34,12 @@ export default function Profile() {
   if (!user) {
     return (
       <div className="max-w-md mx-auto px-4 py-20 text-center space-y-4">
-        <h2 className="text-2xl font-bold text-slate-900">Acesso Restrito</h2>
-        <p className="text-slate-600 text-sm">Você precisa estar logado para ver seu perfil.</p>
+        <h2 className="text-2xl font-bold text-slate-900">{t('profile.acessoRestrito')}</h2>
+        <p className="text-slate-600 text-sm">{t('profile.loginNecessario')}</p>
         <Link to="/login">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white">Fazer Login</Button>
+          <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+            {t('common.fazerLogin')}
+          </Button>
         </Link>
       </div>
     )
@@ -52,14 +56,14 @@ export default function Profile() {
       })
       refreshUser()
       toast({
-        title: 'Perfil atualizado',
-        description: 'Suas informações foram salvas com sucesso.',
+        title: t('profile.perfilAtualizadoTitulo'),
+        description: t('profile.perfilAtualizadoDesc'),
       })
     } catch (err) {
       console.error(err)
       toast({
-        title: 'Erro ao atualizar',
-        description: 'Não foi possível salvar as alterações.',
+        title: t('profile.erroAtualizarTitulo'),
+        description: t('profile.erroAtualizarDesc'),
         variant: 'destructive',
       })
     } finally {
@@ -72,13 +76,13 @@ export default function Profile() {
     try {
       await requestVerification(user.email)
       toast({
-        title: 'E-mail de verificação enviado',
-        description: 'Verifique a caixa de entrada de ' + user.email,
+        title: t('profile.verificacaoEnviadaTitulo'),
+        description: t('profile.verificacaoEnviadaDesc', { email: user.email }),
       })
     } catch (err) {
       toast({
-        title: 'Erro no envio',
-        description: 'Tente novamente em instantes.',
+        title: t('profile.erroEnvioTitulo'),
+        description: t('profile.erroEnvioDesc'),
         variant: 'destructive',
       })
     } finally {
@@ -104,7 +108,7 @@ export default function Profile() {
               <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">{user.name}</h1>
               {isOwner && (
                 <Badge variant="secondary" className="bg-blue-100 text-blue-800 text-xs">
-                  Dono / Admin
+                  {t('profile.donoAdmin')}
                 </Badge>
               )}
             </div>
@@ -118,7 +122,7 @@ export default function Profile() {
           className="text-red-600 hover:bg-red-50 hover:text-red-700 border-red-200 self-start sm:self-auto"
         >
           <LogOut className="w-4 h-4 mr-2" />
-          Sair da Conta
+          {t('profile.sairConta')}
         </Button>
       </div>
 
@@ -126,21 +130,21 @@ export default function Profile() {
         {/* Status card */}
         <Card className="md:col-span-1 border-border">
           <CardContent className="p-6 space-y-4">
-            <h3 className="font-bold text-slate-900 text-sm">Status da Conta</h3>
+            <h3 className="font-bold text-slate-900 text-sm">{t('profile.statusConta')}</h3>
 
             <div className="space-y-3 text-xs">
               <div>
-                <span className="text-slate-500 block mb-1">Verificação de E-mail:</span>
+                <span className="text-slate-500 block mb-1">{t('profile.verificacaoEmail')}:</span>
                 {user.verified ? (
                   <span className="inline-flex items-center gap-1 font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">
                     <CheckCircle2 className="w-3.5 h-3.5" />
-                    Confirmado
+                    {t('profile.confirmado')}
                   </span>
                 ) : (
                   <div className="space-y-2">
                     <span className="inline-flex items-center gap-1 font-semibold text-amber-600 bg-amber-50 px-2 py-1 rounded">
                       <AlertCircle className="w-3.5 h-3.5" />
-                      Pendente
+                      {t('profile.pendente')}
                     </span>
                     <Button
                       variant="link"
@@ -149,22 +153,24 @@ export default function Profile() {
                       disabled={resendingVerification}
                       className="p-0 h-auto text-xs text-blue-600"
                     >
-                      {resendingVerification ? 'Enviando...' : 'Reenviar e-mail de confirmação'}
+                      {resendingVerification
+                        ? t('common.enviando')
+                        : t('profile.reenviarConfirmacao')}
                     </Button>
                   </div>
                 )}
               </div>
 
               <div className="pt-2 border-t border-slate-100">
-                <span className="text-slate-500 block mb-1">Tipo de Acesso:</span>
+                <span className="text-slate-500 block mb-1">{t('profile.tipoAcesso')}:</span>
                 <span className="font-semibold text-slate-800">
-                  {isOwner ? 'Proprietário (Acesso Total)' : 'Membro Comunitário (Freemium)'}
+                  {isOwner ? t('profile.acessoProprietario') : t('profile.membroComunitario')}
                 </span>
               </div>
 
               {isOwner && (
                 <div className="pt-2 border-t border-slate-100 space-y-2">
-                  <span className="text-slate-500 block mb-1">Atalhos de Gestão:</span>
+                  <span className="text-slate-500 block mb-1">{t('profile.atalhosGestao')}:</span>
                   <Link to="/painel" className="block">
                     <Button
                       variant="outline"
@@ -172,7 +178,7 @@ export default function Profile() {
                       className="w-full justify-start text-xs text-blue-600"
                     >
                       <Layers className="w-3.5 h-3.5 mr-2" />
-                      Gerenciar Conteúdos
+                      {t('profile.gerenciarConteudos')}
                     </Button>
                   </Link>
                   <Link to="/estatisticas" className="block">
@@ -182,7 +188,7 @@ export default function Profile() {
                       className="w-full justify-start text-xs text-slate-700"
                     >
                       <Sparkles className="w-3.5 h-3.5 mr-2" />
-                      Painel de Estatísticas
+                      {t('profile.painelEstatisticas')}
                     </Button>
                   </Link>
                 </div>
@@ -194,12 +200,12 @@ export default function Profile() {
         {/* Edit profile form */}
         <Card className="md:col-span-2 border-border">
           <CardContent className="p-6 space-y-6">
-            <h3 className="font-bold text-slate-900 text-sm">Dados Pessoais</h3>
+            <h3 className="font-bold text-slate-900 text-sm">{t('profile.dadosPessoais')}</h3>
 
             <form onSubmit={handleUpdateProfile} className="space-y-4">
               <div className="space-y-1.5">
                 <Label htmlFor="prof-name" className="text-xs font-semibold">
-                  Nome Completo
+                  {t('register.nomeCompleto')}
                 </Label>
                 <Input
                   id="prof-name"
@@ -212,7 +218,7 @@ export default function Profile() {
 
               <div className="space-y-1.5">
                 <Label htmlFor="prof-email" className="text-xs font-semibold">
-                  Endereço de E-mail
+                  {t('profile.enderecoEmail')}
                 </Label>
                 <Input
                   id="prof-email"
@@ -220,9 +226,7 @@ export default function Profile() {
                   disabled
                   className="bg-slate-50 text-slate-500 cursor-not-allowed"
                 />
-                <p className="text-[11px] text-slate-400">
-                  O e-mail é utilizado para recuperação de acesso e notificações.
-                </p>
+                <p className="text-[11px] text-slate-400">{t('profile.emailRecuperacao')}</p>
               </div>
 
               <div className="pt-2 flex justify-end">
@@ -231,7 +235,7 @@ export default function Profile() {
                   disabled={saving}
                   className="bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs px-5"
                 >
-                  {saving ? 'Salvando...' : 'Salvar Alterações'}
+                  {saving ? t('common.salvando') : t('profile.salvarAlteracoes')}
                 </Button>
               </div>
             </form>

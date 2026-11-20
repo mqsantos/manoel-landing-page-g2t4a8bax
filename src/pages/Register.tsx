@@ -7,11 +7,13 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
 import { useAuth } from '@/context/AuthContext'
 import { useToast } from '@/hooks/use-toast'
+import { useLanguage } from '@/lib/i18n'
 
 export default function Register() {
   const { register } = useAuth()
   const navigate = useNavigate()
   const { toast } = useToast()
+  const { t } = useLanguage()
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -24,8 +26,8 @@ export default function Register() {
 
     if (password.length < 8) {
       toast({
-        title: 'Senha muito curta',
-        description: 'A senha deve conter no mínimo 8 caracteres.',
+        title: t('register.senhaCurtaTitulo'),
+        description: t('register.senhaCurtaDesc'),
         variant: 'destructive',
       })
       return
@@ -35,15 +37,15 @@ export default function Register() {
     try {
       await register(name, email, password)
       toast({
-        title: 'Conta criada com sucesso!',
-        description: 'Enviamos também um e-mail de confirmação para sua caixa de entrada.',
+        title: t('register.sucessoTitulo'),
+        description: t('register.sucessoDesc'),
       })
       navigate('/conteudos')
     } catch (err: any) {
       console.error(err)
       toast({
-        title: 'Erro no cadastro',
-        description: err?.message || 'Não foi possível criar sua conta. Tente outro e-mail.',
+        title: t('register.erroTitulo'),
+        description: err?.message || t('register.erroDesc'),
         variant: 'destructive',
       })
     } finally {
@@ -58,11 +60,9 @@ export default function Register() {
           MS
         </div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-          Criar Conta Gratuita
+          {t('register.titulo')}
         </h1>
-        <p className="text-xs sm:text-sm text-slate-500">
-          Junte-se à comunidade de engenharia e acesse conteúdos abertos e prévias.
-        </p>
+        <p className="text-xs sm:text-sm text-slate-500">{t('register.subtitulo')}</p>
       </div>
 
       <Card className="border-border shadow-md bg-white">
@@ -70,7 +70,7 @@ export default function Register() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="reg-name" className="text-xs font-semibold">
-                Nome Completo
+                {t('register.nomeCompleto')}
               </Label>
               <div className="relative">
                 <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -88,7 +88,7 @@ export default function Register() {
 
             <div className="space-y-1.5">
               <Label htmlFor="reg-email" className="text-xs font-semibold">
-                Seu Melhor E-mail
+                {t('register.emailLabel')}
               </Label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -106,7 +106,7 @@ export default function Register() {
 
             <div className="space-y-1.5">
               <Label htmlFor="reg-password" className="text-xs font-semibold">
-                Criar Senha (mínimo 8 dígitos)
+                {t('register.senhaLabel')}
               </Label>
               <div className="relative">
                 <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -128,25 +128,25 @@ export default function Register() {
               disabled={loading}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold h-11 text-sm shadow-sm"
             >
-              {loading ? 'Criando Conta...' : 'Cadastrar Gratuitamente'}
+              {loading ? t('register.criandoConta') : t('register.cadastrar')}
             </Button>
           </form>
 
           <div className="space-y-2 pt-2 border-t border-slate-100 text-xs text-slate-500">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-              <span>Acesso instantâneo a artigos e episódios</span>
+              <span>{t('register.beneficioAcesso')}</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-              <span>Verificação de e-mail enviada automaticamente</span>
+              <span>{t('register.beneficioVerificacao')}</span>
             </div>
           </div>
 
           <div className="pt-2 text-center text-xs text-slate-600">
-            Já tem uma conta cadastrada?{' '}
+            {t('register.temConta')}{' '}
             <Link to="/login" className="text-blue-600 font-bold hover:underline">
-              Fazer login
+              {t('register.fazerLogin')}
             </Link>
           </div>
         </CardContent>
@@ -154,7 +154,7 @@ export default function Register() {
 
       <div className="text-center text-xs text-slate-400 flex items-center justify-center gap-1.5">
         <ShieldCheck className="w-4 h-4 text-emerald-500" />
-        <span>Seus dados estão protegidos. Nenhum spam.</span>
+        <span>{t('register.dadosProtegidos')}</span>
       </div>
     </div>
   )

@@ -23,12 +23,14 @@ import { ContentItem } from '@/types/database'
 import { useAuth } from '@/context/AuthContext'
 import { useToast } from '@/hooks/use-toast'
 import { useSiteSettings } from '@/hooks/use-site-settings'
+import { useLanguage } from '@/lib/i18n'
 
 export default function ContentDetail() {
   const { slug } = useParams<{ slug: string }>()
   const { user } = useAuth()
   const { toast } = useToast()
   const { settings } = useSiteSettings()
+  const { t } = useLanguage()
   const [content, setContent] = useState<ContentItem | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -50,8 +52,8 @@ export default function ContentDetail() {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(window.location.href)
       toast({
-        title: 'Link copiado!',
-        description: 'O link deste conteúdo foi copiado para sua área de transferência.',
+        title: t('detail.linkCopiado'),
+        description: t('detail.linkCopiadoDesc'),
       })
     }
   }
@@ -69,12 +71,12 @@ export default function ContentDetail() {
   if (!content) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-20 text-center space-y-4">
-        <h2 className="text-2xl font-bold text-slate-900">Conteúdo não encontrado</h2>
-        <p className="text-slate-600">O conteúdo que você buscou não existe ou foi removido.</p>
+        <h2 className="text-2xl font-bold text-slate-900">{t('detail.naoEncontrado')}</h2>
+        <p className="text-slate-600">{t('detail.naoEncontradoTexto')}</p>
         <Link to="/conteudos">
           <Button variant="outline">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar para a biblioteca
+            {t('detail.voltarBiblioteca')}
           </Button>
         </Link>
       </div>
@@ -84,13 +86,13 @@ export default function ContentDetail() {
   const getTypeLabel = (type: string) => {
     switch (type) {
       case 'video':
-        return 'Vídeo / Masterclass'
+        return t('detail.tipoVideo')
       case 'audio':
-        return 'Áudio / Podcast'
+        return t('detail.tipoAudio')
       case 'pdf':
-        return 'Documento / PDF'
+        return t('detail.tipoPdf')
       default:
-        return 'Artigo Técnico'
+        return t('detail.tipoArtigo')
     }
   }
 
@@ -103,7 +105,7 @@ export default function ContentDetail() {
           className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
         >
           <ArrowLeft className="w-4 h-4 mr-1.5" />
-          Voltar para todos os conteúdos
+          {t('detail.voltarTodos')}
         </Link>
       </div>
 
@@ -123,14 +125,14 @@ export default function ContentDetail() {
               className="bg-amber-100 text-amber-800 text-xs font-semibold gap-1 py-1"
             >
               <Lock className="w-3 h-3" />
-              Conteúdo Premium (Prévia Aberta)
+              {t('detail.premiumPrevia')}
             </Badge>
           ) : (
             <Badge
               variant="secondary"
               className="bg-emerald-100 text-emerald-800 text-xs font-semibold py-1"
             >
-              Acesso Gratuito
+              {t('detail.acessoGratuito')}
             </Badge>
           )}
 
@@ -148,7 +150,7 @@ export default function ContentDetail() {
             className="ml-auto text-xs text-slate-500 hover:text-slate-900 h-8 gap-1"
           >
             <Share2 className="w-3.5 h-3.5" />
-            Compartilhar
+            {t('detail.compartilhar')}
           </Button>
         </div>
 
@@ -180,12 +182,10 @@ export default function ContentDetail() {
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-amber-900 font-bold text-sm">
               <Lock className="w-4 h-4 text-amber-600" />
-              <span>Material do Programa Premium de Assinantes</span>
+              <span>{t('detail.premiumBanner')}</span>
             </div>
             <p className="text-xs text-amber-800 leading-relaxed">
-              Durante o período de pré-lançamento, a prévia está aberta a todos os visitantes.
-              Registre seu interesse para garantir o plano sem taxa de adesão quando a cobrança
-              começar.
+              {t('detail.premiumBannerTexto')}
             </p>
           </div>
           <Link to="/planos" className="flex-shrink-0">
@@ -193,7 +193,7 @@ export default function ContentDetail() {
               size="sm"
               className="bg-amber-600 hover:bg-amber-700 text-white font-medium text-xs shadow-sm"
             >
-              Registrar Interesse no Plano
+              {t('detail.registrarInteressePlano')}
             </Button>
           </Link>
         </div>
@@ -212,7 +212,7 @@ export default function ContentDetail() {
                   className="w-full h-full object-contain"
                   poster={content.cover_image}
                 >
-                  Seu navegador não suporta reprodução de vídeos.
+                  {t('detail.videoNaoSuportado')}
                 </video>
               ) : content.external_url ? (
                 <div className="text-center p-8 space-y-4">
@@ -221,10 +221,10 @@ export default function ContentDetail() {
                   </div>
                   <div>
                     <h4 className="text-white font-bold text-lg">
-                      Vídeo da Masterclass Disponível
+                      {t('detail.videoExternoTitulo')}
                     </h4>
                     <p className="text-slate-400 text-xs max-w-sm mx-auto mt-1">
-                      Assista ao streaming hospedado na plataforma externa.
+                      {t('detail.videoExternoTexto')}
                     </p>
                   </div>
                   <a
@@ -235,14 +235,14 @@ export default function ContentDetail() {
                   >
                     <Button className="bg-rose-600 hover:bg-rose-700 text-white font-medium gap-2">
                       <ExternalLink className="w-4 h-4" />
-                      Assistir no Player Externo
+                      {t('detail.assistirExterno')}
                     </Button>
                   </a>
                 </div>
               ) : (
                 <div className="text-slate-400 text-center p-8">
                   <Video className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">Arquivo de vídeo em processamento</p>
+                  <p className="text-sm">{t('detail.videoProcessando')}</p>
                 </div>
               )}
             </div>
@@ -258,10 +258,8 @@ export default function ContentDetail() {
                   <Headphones className="w-7 h-7" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-900 text-lg">Episódio em Áudio</h3>
-                  <p className="text-xs text-slate-500">
-                    Ouça o episódio direto no navegador ou na sua plataforma favorita.
-                  </p>
+                  <h3 className="font-bold text-slate-900 text-lg">{t('detail.audioTitulo')}</h3>
+                  <p className="text-xs text-slate-500">{t('detail.audioTexto')}</p>
                 </div>
               </div>
 
@@ -269,21 +267,19 @@ export default function ContentDetail() {
                 <div className="pt-2">
                   <audio controls className="w-full">
                     <source src={content.file} />
-                    Seu navegador não suporta reprodução de áudio.
+                    {t('detail.audioNaoSuportado')}
                   </audio>
                 </div>
               ) : content.external_url ? (
                 <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl border border-border">
-                  <div className="text-xs text-slate-600">
-                    Episódio disponível no Spotify / Plataforma externa
-                  </div>
+                  <div className="text-xs text-slate-600">{t('detail.audioExterno')}</div>
                   <a href={content.external_url} target="_blank" rel="noreferrer">
                     <Button
                       size="sm"
                       className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 text-xs"
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
-                      Ouvir Episódio Externo
+                      {t('detail.ouvirExterno')}
                     </Button>
                   </a>
                 </div>
@@ -301,10 +297,9 @@ export default function ContentDetail() {
                   <FileText className="w-7 h-7" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-900 text-lg">Documento / Framework em PDF</h3>
+                  <h3 className="font-bold text-slate-900 text-lg">{t('detail.pdfTitulo')}</h3>
                   <p className="text-xs text-slate-600 mt-0.5">
-                    {content.duration_or_read_time ||
-                      'Documento técnico pronto para download e consulta'}
+                    {content.duration_or_read_time || t('detail.pdfFallback')}
                   </p>
                 </div>
               </div>
@@ -314,19 +309,19 @@ export default function ContentDetail() {
                   <a href={content.file} download target="_blank" rel="noreferrer">
                     <Button className="bg-amber-600 hover:bg-amber-700 text-white font-medium gap-2">
                       <Download className="w-4 h-4" />
-                      Baixar PDF Completo
+                      {t('detail.baixarPdf')}
                     </Button>
                   </a>
                 ) : content.external_url ? (
                   <a href={content.external_url} target="_blank" rel="noreferrer">
                     <Button className="bg-amber-600 hover:bg-amber-700 text-white font-medium gap-2">
                       <Download className="w-4 h-4" />
-                      Acessar PDF Online
+                      {t('detail.acessarPdfOnline')}
                     </Button>
                   </a>
                 ) : (
                   <Button disabled variant="outline">
-                    Arquivo em upload
+                    {t('detail.arquivoUpload')}
                   </Button>
                 )}
               </div>
@@ -339,7 +334,7 @@ export default function ContentDetail() {
           <div className="bg-white rounded-2xl border border-border p-6 sm:p-10 space-y-6">
             <h3 className="text-xl font-bold text-slate-900 pb-4 border-b border-slate-100 flex items-center gap-2">
               <FileText className="w-5 h-5 text-blue-600" />
-              Texto Integral & Notas Técnicas
+              {t('detail.textoIntegral')}
             </h3>
             <div className="prose prose-slate max-w-none text-slate-700 leading-relaxed space-y-4 whitespace-pre-wrap font-sans text-sm sm:text-base">
               {content.content_body}
@@ -364,11 +359,8 @@ export default function ContentDetail() {
           )}
         </div>
         <div className="space-y-1">
-          <h4 className="font-bold text-slate-900 text-base">Publicado por Manoel Santos</h4>
-          <p className="text-xs text-slate-600 leading-relaxed">
-            Systems Engineering Manager na Boeing. Mais de 20 anos de liderança em Lean Product
-            Development e transformação cultural em engenharia aeroespacial.
-          </p>
+          <h4 className="font-bold text-slate-900 text-base">{t('detail.publicadoPor')}</h4>
+          <p className="text-xs text-slate-600 leading-relaxed">{t('detail.autorBio')}</p>
         </div>
       </div>
     </div>

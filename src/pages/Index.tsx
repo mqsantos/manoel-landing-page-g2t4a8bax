@@ -24,6 +24,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { ContentService } from '@/services/contentService'
 import { ContentItem } from '@/types/database'
 import { useSiteSettings } from '@/hooks/use-site-settings'
+import { useLanguage } from '@/lib/i18n'
 import { SkillCard } from '@/services/siteSettingsService'
 
 /** Renderiza **negrito** dentro de um texto editável pelo dono. */
@@ -48,6 +49,7 @@ const SKILL_ICONS = [Briefcase, Layers, Cpu]
 
 export default function Index() {
   const { settings } = useSiteSettings()
+  const { t } = useLanguage()
   const [featuredContents, setFeaturedContents] = useState<ContentItem[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -74,13 +76,13 @@ export default function Index() {
   const getTypeLabel = (type: string) => {
     switch (type) {
       case 'video':
-        return 'Vídeo'
+        return t('index.tipoVideo')
       case 'audio':
-        return 'Áudio / Podcast'
+        return t('index.tipoAudio')
       case 'pdf':
-        return 'Guia PDF'
+        return t('index.tipoPdf')
       default:
-        return 'Artigo'
+        return t('index.tipoArtigo')
     }
   }
 
@@ -179,7 +181,7 @@ export default function Index() {
                       </div>
                       <div
                         className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-emerald-500 border-2 border-slate-900 flex items-center justify-center"
-                        title="Ativo & Compartilhando"
+                        title={t('index.ativoTitle')}
                       >
                         <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
                       </div>
@@ -216,7 +218,7 @@ export default function Index() {
                       className="inline-flex items-center gap-2 text-xs font-medium text-blue-400 hover:text-blue-300 transition-colors"
                     >
                       <Linkedin className="w-4 h-4" />
-                      <span>Perfil no LinkedIn</span>
+                      <span>{t('index.perfilLinkedin')}</span>
                       <ExternalLink className="w-3 h-3" />
                     </a>
                     <a
@@ -224,7 +226,7 @@ export default function Index() {
                       className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors"
                     >
                       <Mail className="w-4 h-4" />
-                      <span>Contato direto</span>
+                      <span>{t('index.contatoDireto')}</span>
                     </a>
                   </div>
                 </div>
@@ -241,14 +243,13 @@ export default function Index() {
             variant="outline"
             className="mb-3 px-3 py-1 font-semibold uppercase tracking-wider text-blue-700 bg-blue-50 border-blue-200"
           >
-            Experiência & Expertise
+            {t('index.badgeExperiencia')}
           </Badge>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Mais de duas décadas na vanguarda da aviação mundial
+            {t('index.tituloTrajetoria')}
           </h2>
           <p className="mt-4 text-slate-600 text-base leading-relaxed">
-            Unindo a precisão da engenharia aeronáutica com a agilidade do Lean e as oportunidades
-            da inteligência artificial para elevar times e processos ao padrão global.
+            {t('index.textoTrajetoria')}
           </p>
         </div>
 
@@ -294,10 +295,10 @@ export default function Index() {
                 variant="secondary"
                 className="mb-2 bg-blue-100 text-blue-800 border-none font-medium"
               >
-                Publicações & Artigos de Referência
+                {t('index.badgePublicacoes')}
               </Badge>
               <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
-                Pensamento que guia a engenharia moderna
+                {t('index.tituloPublicacoes')}
               </h2>
             </div>
             <Link to="/conteudos?tipo=article" className="mt-4 md:mt-0">
@@ -305,7 +306,7 @@ export default function Index() {
                 variant="ghost"
                 className="text-blue-600 hover:text-blue-700 p-0 hover:bg-transparent font-medium gap-1"
               >
-                Ver todos os artigos <ChevronRight className="w-4 h-4" />
+                {t('index.verTodosArtigos')} <ChevronRight className="w-4 h-4" />
               </Button>
             </Link>
           </div>
@@ -315,23 +316,21 @@ export default function Index() {
               <CardContent className="p-8 space-y-4">
                 <div className="flex items-center justify-between">
                   <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50/50">
-                    Artigo Aberto
+                    {t('index.artigoAberto')}
                   </Badge>
-                  <span className="text-xs text-muted-foreground">7 min de leitura</span>
+                  <span className="text-xs text-muted-foreground">
+                    {t('index.minLeitura', { n: 7 })}
+                  </span>
                 </div>
                 <h3 className="text-2xl font-bold text-slate-900">The Lean Developer</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  Como conectar os princípios do Lean Product and Process Development (LPPD) à
-                  engenharia moderna de software e sistemas aeronáuticos. Princípios de Set-Based
-                  Concurrent Engineering e resolução sistemática de problemas (A3).
-                </p>
+                <p className="text-sm text-slate-600 leading-relaxed">{t('index.leanDesc')}</p>
                 <div className="pt-2">
                   <Link to="/conteudos/the-lean-developer-principios-agels">
                     <Button
                       variant="default"
                       className="bg-slate-900 hover:bg-blue-600 text-white gap-2 text-xs"
                     >
-                      Ler Artigo Completo
+                      {t('index.lerArtigo')}
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Button>
                   </Link>
@@ -343,23 +342,21 @@ export default function Index() {
               <CardContent className="p-8 space-y-4">
                 <div className="flex items-center justify-between">
                   <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50/50">
-                    Artigo Aberto
+                    {t('index.artigoAberto')}
                   </Badge>
-                  <span className="text-xs text-muted-foreground">9 min de leitura</span>
+                  <span className="text-xs text-muted-foreground">
+                    {t('index.minLeitura', { n: 9 })}
+                  </span>
                 </div>
                 <h3 className="text-2xl font-bold text-slate-900">The Augmented Engineer</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  Uma análise aprofundada sobre como modelos de linguagem e automação generativa
-                  potencializam requisitos, rastreabilidade e arquitetura de sistemas aeroespaciais
-                  críticos, mantendo o julgamento humano no controle.
-                </p>
+                <p className="text-sm text-slate-600 leading-relaxed">{t('index.augEngDesc')}</p>
                 <div className="pt-2">
                   <Link to="/conteudos/the-augmented-engineer-ia-engenharia">
                     <Button
                       variant="default"
                       className="bg-slate-900 hover:bg-blue-600 text-white gap-2 text-xs"
                     >
-                      Ler Artigo Completo
+                      {t('index.lerArtigo')}
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Button>
                   </Link>
@@ -375,18 +372,16 @@ export default function Index() {
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
           <div>
             <Badge variant="outline" className="mb-2 text-blue-700 bg-blue-50 border-blue-200">
-              Acervo Multimídia
+              {t('index.badgeAcervo')}
             </Badge>
             <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
-              Aprenda com formatos diretos e práticos
+              {t('index.tituloAcervo')}
             </h2>
-            <p className="mt-1 text-sm text-slate-600">
-              Vídeos, episódios em áudio, templates em PDF e ensaios técnicos.
-            </p>
+            <p className="mt-1 text-sm text-slate-600">{t('index.textoAcervo')}</p>
           </div>
           <Link to="/conteudos" className="mt-4 md:mt-0">
             <Button className="bg-blue-600 hover:bg-blue-700 text-white gap-2">
-              Explorar Todos os Conteúdos
+              {t('index.explorarConteudos')}
               <ArrowRight className="w-4 h-4" />
             </Button>
           </Link>
@@ -418,14 +413,14 @@ export default function Index() {
                           className="bg-amber-100 text-amber-800 text-[11px] gap-1 font-semibold"
                         >
                           <Lock className="w-3 h-3" />
-                          Premium
+                          {t('common.premium')}
                         </Badge>
                       ) : (
                         <Badge
                           variant="secondary"
                           className="bg-emerald-100 text-emerald-800 text-[11px] font-semibold"
                         >
-                          Grátis
+                          {t('common.gratis')}
                         </Badge>
                       )}
                     </div>
@@ -440,12 +435,12 @@ export default function Index() {
                   </div>
 
                   <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
-                    <span>{item.duration_or_read_time || 'Acesso imediato'}</span>
+                    <span>{item.duration_or_read_time || t('index.acessoImediato')}</span>
                     <Link
                       to={`/conteudos/${item.slug}`}
                       className="font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1"
                     >
-                      Acessar <ChevronRight className="w-3 h-3" />
+                      {t('index.acessar')} <ChevronRight className="w-3 h-3" />
                     </Link>
                   </div>
                 </CardContent>

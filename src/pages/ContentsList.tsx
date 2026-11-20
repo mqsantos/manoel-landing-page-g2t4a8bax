@@ -18,8 +18,10 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { ContentService } from '@/services/contentService'
 import { ContentItem, ContentType } from '@/types/database'
+import { useLanguage } from '@/lib/i18n'
 
 export default function ContentsList() {
+  const { t } = useLanguage()
   const [searchParams, setSearchParams] = useSearchParams()
   const [contents, setContents] = useState<ContentItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -102,13 +104,13 @@ export default function ContentsList() {
   const getTypeLabel = (type: string) => {
     switch (type) {
       case 'video':
-        return 'Vídeo'
+        return t('contents.tipoVideo')
       case 'audio':
-        return 'Áudio'
+        return t('contents.tipoAudio')
       case 'pdf':
-        return 'PDF'
+        return t('contents.tipoPdf')
       default:
-        return 'Artigo'
+        return t('contents.tipoArtigo')
     }
   }
 
@@ -120,16 +122,12 @@ export default function ContentsList() {
           variant="outline"
           className="text-blue-700 bg-blue-50 border-blue-200 uppercase tracking-wider text-xs"
         >
-          Biblioteca de Conhecimento
+          {t('contents.badgeBiblioteca')}
         </Badge>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-          Conteúdos, Artigos & Recursos
+          {t('contents.h1')}
         </h1>
-        <p className="text-base text-slate-600 leading-relaxed">
-          Explore artigos analíticos, masterclasses em vídeo, episódios em áudio e frameworks em PDF
-          sobre Lean Product Development, engenharia de sistemas aeroespaciais e inteligência
-          artificial aplicada.
-        </p>
+        <p className="text-base text-slate-600 leading-relaxed">{t('contents.intro')}</p>
       </div>
 
       {/* Filters Bar */}
@@ -141,7 +139,7 @@ export default function ContentsList() {
             <Input
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Pesquisar por tema, título, tags (Lean, IA, A3...)"
+              placeholder={t('contents.buscaPlaceholder')}
               className="pl-10 bg-white"
             />
           </form>
@@ -149,7 +147,7 @@ export default function ContentsList() {
           {/* Access filter (Grátis / Premium) */}
           <div className="md:col-span-6 flex flex-wrap items-center justify-end gap-2">
             <span className="text-xs font-semibold text-slate-500 mr-2 flex items-center gap-1">
-              <Filter className="w-3.5 h-3.5" /> Acesso:
+              <Filter className="w-3.5 h-3.5" /> {t('contents.filtroAcesso')}
             </span>
             <Button
               variant={currentPremium === 'all' ? 'default' : 'outline'}
@@ -157,7 +155,7 @@ export default function ContentsList() {
               onClick={() => handlePremiumChange('all')}
               className={currentPremium === 'all' ? 'bg-slate-900 text-white' : 'bg-white'}
             >
-              Todos
+              {t('contents.todos')}
             </Button>
             <Button
               variant={currentPremium === 'free' ? 'default' : 'outline'}
@@ -169,7 +167,7 @@ export default function ContentsList() {
                   : 'bg-white text-emerald-700 border-emerald-200'
               }
             >
-              Apenas Grátis
+              {t('contents.apenasGratis')}
             </Button>
             <Button
               variant={currentPremium === 'premium' ? 'default' : 'outline'}
@@ -182,20 +180,22 @@ export default function ContentsList() {
               }
             >
               <Lock className="w-3 h-3 mr-1" />
-              Premium
+              {t('common.premium')}
             </Button>
           </div>
         </div>
 
         {/* Content Type Tabs */}
         <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-200/60">
-          <span className="text-xs font-semibold text-slate-500 mr-2">Formato:</span>
+          <span className="text-xs font-semibold text-slate-500 mr-2">
+            {t('contents.filtroFormato')}
+          </span>
           {[
-            { id: 'all', label: 'Todos os formatos' },
-            { id: 'article', label: 'Artigos' },
-            { id: 'video', label: 'Vídeos' },
-            { id: 'audio', label: 'Áudios' },
-            { id: 'pdf', label: 'PDFs' },
+            { id: 'all', label: t('contents.todosFormatos') },
+            { id: 'article', label: t('contents.artigo') },
+            { id: 'video', label: t('contents.video') },
+            { id: 'audio', label: t('contents.audio') },
+            { id: 'pdf', label: t('contents.pdf') },
           ].map((type) => (
             <button
               key={type.id}
@@ -218,7 +218,7 @@ export default function ContentsList() {
               className="ml-auto text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 h-8 gap-1"
             >
               <X className="w-3 h-3" />
-              Limpar filtros
+              {t('contents.limparFiltros')}
             </Button>
           )}
         </div>
@@ -236,12 +236,10 @@ export default function ContentsList() {
           <div className="w-12 h-12 rounded-full bg-slate-200 text-slate-500 mx-auto flex items-center justify-center">
             <Search className="w-6 h-6" />
           </div>
-          <h3 className="text-lg font-bold text-slate-900">Nenhum conteúdo encontrado</h3>
-          <p className="text-sm text-slate-500 max-w-sm mx-auto">
-            Tente ajustar os filtros ou pesquisar com outros termos.
-          </p>
+          <h3 className="text-lg font-bold text-slate-900">{t('contents.vazioTitulo')}</h3>
+          <p className="text-sm text-slate-500 max-w-sm mx-auto">{t('contents.vazioTexto')}</p>
           <Button onClick={clearFilters} variant="outline" size="sm">
-            Limpar filtros de busca
+            {t('contents.limparBusca')}
           </Button>
         </div>
       ) : (
@@ -265,14 +263,14 @@ export default function ContentsList() {
                         className="bg-amber-100 text-amber-800 text-xs font-semibold gap-1"
                       >
                         <Lock className="w-3 h-3" />
-                        Premium
+                        {t('common.premium')}
                       </Badge>
                     ) : (
                       <Badge
                         variant="secondary"
                         className="bg-emerald-100 text-emerald-800 text-xs font-semibold"
                       >
-                        Grátis
+                        {t('common.gratis')}
                       </Badge>
                     )}
                   </div>
@@ -304,13 +302,13 @@ export default function ContentsList() {
 
                 <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
                   <span className="text-slate-400 font-medium">
-                    {item.duration_or_read_time || 'Acesso liberado'}
+                    {item.duration_or_read_time || t('contents.acessoLiberado')}
                   </span>
                   <Link
                     to={`/conteudos/${item.slug}`}
                     className="font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1"
                   >
-                    {item.is_premium ? 'Ver detalhes' : 'Acessar agora'}
+                    {item.is_premium ? t('contents.verDetalhes') : t('contents.acessarAgora')}
                     <ChevronRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
@@ -323,15 +321,12 @@ export default function ContentsList() {
       {/* Call to action card */}
       <div className="mt-12 p-8 rounded-2xl bg-slate-900 text-white flex flex-col md:flex-row items-center justify-between gap-6">
         <div>
-          <h3 className="text-xl font-bold">Quer acesso antecipado a novos conteúdos?</h3>
-          <p className="text-sm text-slate-300 mt-1">
-            Cadastre-se gratuitamente para ser avisado sempre que Manoel Santos publicar novos
-            ensaios ou abrir inscrições para mentorias.
-          </p>
+          <h3 className="text-xl font-bold">{t('contents.ctaTitulo')}</h3>
+          <p className="text-sm text-slate-300 mt-1">{t('contents.ctaTexto')}</p>
         </div>
         <Link to="/cadastro" className="flex-shrink-0">
           <Button className="bg-blue-600 hover:bg-blue-500 text-white font-medium px-6">
-            Criar Minha Conta Gratuita
+            {t('contents.ctaBotao')}
           </Button>
         </Link>
       </div>

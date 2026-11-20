@@ -7,11 +7,13 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
 import { useAuth } from '@/context/AuthContext'
 import { useToast } from '@/hooks/use-toast'
+import { useLanguage } from '@/lib/i18n'
 
 export default function Login() {
   const { login, requestPasswordReset } = useAuth()
   const navigate = useNavigate()
   const { toast } = useToast()
+  const { t } = useLanguage()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -26,15 +28,15 @@ export default function Login() {
     try {
       await login(email, password)
       toast({
-        title: 'Bem-vindo de volta!',
-        description: 'Login realizado com sucesso.',
+        title: t('login.bemVindoTitulo'),
+        description: t('login.bemVindoDesc'),
       })
       navigate('/conteudos')
     } catch (err: any) {
       console.error(err)
       toast({
-        title: 'Falha no login',
-        description: 'Verifique se seu e-mail e senha estão corretos.',
+        title: t('login.falhaTitulo'),
+        description: t('login.falhaDesc'),
         variant: 'destructive',
       })
     } finally {
@@ -45,8 +47,8 @@ export default function Login() {
   const handleForgotPassword = async () => {
     if (!email.trim()) {
       toast({
-        title: 'Informe seu e-mail',
-        description: 'Digite o e-mail no campo acima para enviarmos o link de recuperação.',
+        title: t('login.informeEmailTitulo'),
+        description: t('login.informeEmailDesc'),
         variant: 'destructive',
       })
       return
@@ -56,13 +58,13 @@ export default function Login() {
       await requestPasswordReset(email)
       setResetSent(true)
       toast({
-        title: 'E-mail de recuperação enviado',
-        description: 'Verifique sua caixa de entrada para redefinir sua senha.',
+        title: t('login.resetEnviadoTitulo'),
+        description: t('login.resetEnviadoDesc'),
       })
     } catch (err) {
       toast({
-        title: 'Erro ao solicitar recuperação',
-        description: 'Verifique o e-mail informado e tente novamente.',
+        title: t('login.resetErroTitulo'),
+        description: t('login.resetErroDesc'),
         variant: 'destructive',
       })
     }
@@ -75,11 +77,9 @@ export default function Login() {
           MS
         </div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-          Entrar na Área de Membros
+          {t('login.titulo')}
         </h1>
-        <p className="text-xs sm:text-sm text-slate-500">
-          Acesse conteúdos exclusivos e acompanhe materiais de Manoel Santos.
-        </p>
+        <p className="text-xs sm:text-sm text-slate-500">{t('login.subtitulo')}</p>
       </div>
 
       <Card className="border-border shadow-md bg-white">
@@ -87,7 +87,7 @@ export default function Login() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="login-email" className="text-xs font-semibold">
-                E-mail
+                {t('common.email')}
               </Label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -106,14 +106,14 @@ export default function Login() {
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <Label htmlFor="login-password" className="text-xs font-semibold">
-                  Senha
+                  {t('common.senha')}
                 </Label>
                 <button
                   type="button"
                   onClick={handleForgotPassword}
                   className="text-[11px] text-blue-600 hover:text-blue-800 font-medium"
                 >
-                  Esqueceu a senha?
+                  {t('login.esqueceuSenha')}
                 </button>
               </div>
               <div className="relative">
@@ -135,20 +135,20 @@ export default function Login() {
               disabled={loading}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold h-11 text-sm shadow-sm"
             >
-              {loading ? 'Entrando...' : 'Entrar na Conta'}
+              {loading ? t('common.entrando') : t('login.entrarConta')}
             </Button>
           </form>
 
           {resetSent && (
             <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-800 text-xs text-center">
-              Instruções de redefinição enviadas para {email}.
+              {t('login.resetInstrucoes', { email })}
             </div>
           )}
 
           <div className="pt-4 border-t border-slate-100 text-center text-xs text-slate-600">
-            Ainda não tem uma conta?{' '}
+            {t('login.semConta')}{' '}
             <Link to="/cadastro" className="text-blue-600 font-bold hover:underline">
-              Criar conta gratuita
+              {t('login.criarContaGratis')}
             </Link>
           </div>
         </CardContent>
@@ -156,7 +156,7 @@ export default function Login() {
 
       <div className="text-center text-xs text-slate-400 flex items-center justify-center gap-1.5">
         <ShieldCheck className="w-4 h-4 text-emerald-500" />
-        <span>Ambiente seguro protegido por Skip Cloud</span>
+        <span>{t('login.ambienteSeguro')}</span>
       </div>
     </div>
   )
