@@ -83,9 +83,26 @@ const pt: Record<string, string> = {
   'plans.fechar': 'Fechar',
   'plans.nome': 'Seu nome',
   'plans.seuEmail': 'Seu e-mail',
-  'plans.notas': 'Observações',
-  'plans.notasPlaceholder': 'Conte brevemente o que você procura (opcional)',
+  'plans.notas': 'O que você mais gostaria de aprender? (Opcional)',
+  'plans.notasPlaceholder':
+    'Ex: Quero aplicar Lean Product Development no meu time de software / aeroespacial...',
   'plans.plano': 'Plano',
+  'plans.camposObrigatorios': 'Preencha os campos obrigatórios',
+  'plans.camposObrigatoriosDesc': 'Informe seu nome e e-mail para registrar o interesse.',
+  'plans.sucessoTitulo': 'Interesse registrado com sucesso!',
+  'plans.sucessoDesc':
+    'Você será o primeiro a ser notificado quando a cobrança começar, com benefícios de pioneiro.',
+  'plans.erroTitulo': 'Erro ao registrar',
+  'plans.erroDesc': 'Tente novamente em instantes.',
+  'plans.modalDesc':
+    'A cobrança ainda não está ativa. Cadastre seus dados para receber o convite pioneiro com desconto quando liberarmos as assinaturas.',
+  'plans.nomePlaceholder': 'Ex: João da Silva',
+  'plans.emailPlaceholder': 'seu.email@exemplo.com',
+  'plans.confirmar': 'Confirmar Interesse',
+  'plans.planoGratuito': 'Plano Gratuito',
+  'plans.planoProMensal': 'Plano Pro (Mensal)',
+  'plans.planoProAnual': 'Plano Pro (Anual)',
+  'plans.planoMentoria': 'Mentoria Executiva',
   // Painel do Dono
   'painel.title': 'Painel do Dono',
   'painel.subtitle':
@@ -270,9 +287,26 @@ const en: Record<string, string> = {
   'plans.fechar': 'Close',
   'plans.nome': 'Your name',
   'plans.seuEmail': 'Your email',
-  'plans.notas': 'Notes',
-  'plans.notasPlaceholder': 'Briefly tell us what you are looking for (optional)',
+  'plans.notas': 'What would you most like to learn? (Optional)',
+  'plans.notasPlaceholder':
+    'Ex: I want to apply Lean Product Development in my software / aerospace team...',
   'plans.plano': 'Plan',
+  'plans.camposObrigatorios': 'Fill in the required fields',
+  'plans.camposObrigatoriosDesc': 'Provide your name and email to register your interest.',
+  'plans.sucessoTitulo': 'Interest registered successfully!',
+  'plans.sucessoDesc':
+    'You will be the first to be notified when billing starts, with pioneer benefits.',
+  'plans.erroTitulo': 'Error registering',
+  'plans.erroDesc': 'Please try again in a moment.',
+  'plans.modalDesc':
+    'Billing is not active yet. Provide your details to receive the pioneer discount invitation when subscriptions open.',
+  'plans.nomePlaceholder': 'Ex: John Doe',
+  'plans.emailPlaceholder': 'your.email@example.com',
+  'plans.confirmar': 'Confirm Interest',
+  'plans.planoGratuito': 'Free Plan',
+  'plans.planoProMensal': 'Pro Plan (Monthly)',
+  'plans.planoProAnual': 'Pro Plan (Annual)',
+  'plans.planoMentoria': 'Executive Mentoring',
   'painel.title': 'Owner Panel',
   'painel.subtitle':
     'Manage videos, audio, PDFs and articles. Define what is free and what belongs to the premium area.',

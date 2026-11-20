@@ -28,6 +28,50 @@ import { PlanType } from '@/types/database'
 import { useAuth } from '@/context/AuthContext'
 import { useToast } from '@/hooks/use-toast'
 import { useSiteSettings } from '@/hooks/use-site-settings'
+import { useLanguage } from '@/lib/i18n'
+import type { PlanKey, PlanSettings } from '@/services/siteSettingsService'
+
+/** Estilos de cartão por chave de plano, preservados do layout original. */
+const PLAN_CARD_STYLES: Record<
+  PlanKey,
+  {
+    cardClass: string
+    badgeClass: string
+    checkClass: string
+    btnClass: string
+    highlighted: boolean
+    planType: PlanType
+  }
+> = {
+  gratis: {
+    cardClass:
+      'border-border hover:shadow-lg transition-all flex flex-col justify-between bg-white',
+    badgeClass: 'bg-slate-100 text-slate-700',
+    checkClass: 'text-emerald-500',
+    btnClass: 'w-full mt-6',
+    highlighted: false,
+    planType: 'gratis',
+  },
+  pro: {
+    cardClass:
+      'border-2 border-blue-600 shadow-xl relative flex flex-col justify-between bg-white scale-105',
+    badgeClass: 'bg-blue-100 text-blue-800 font-semibold',
+    checkClass: 'text-blue-600',
+    btnClass:
+      'w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md shadow-blue-500/20',
+    highlighted: true,
+    planType: 'pro_mensal',
+  },
+  mentoria: {
+    cardClass:
+      'border-border hover:shadow-lg transition-all flex flex-col justify-between bg-white',
+    badgeClass: 'text-indigo-700 border-indigo-200 bg-indigo-50',
+    checkClass: 'text-indigo-500',
+    btnClass: 'w-full mt-6 border-indigo-200 text-indigo-700 hover:bg-indigo-50',
+    highlighted: false,
+    planType: 'mentoria',
+  },
+}
 
 /** Renderiza **negrito** simples dentro do texto de um benefício. */
 const BenefitText = ({ text }: { text: string }) => {
@@ -49,6 +93,7 @@ export default function Plans() {
   const { user } = useAuth()
   const { toast } = useToast()
   const { settings } = useSiteSettings()
+  const { t } = useLanguage()
 
   const [selectedPlan, setSelectedPlan] = useState<PlanType | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
@@ -69,8 +114,8 @@ export default function Plans() {
     e.preventDefault()
     if (!selectedPlan || !name.trim() || !email.trim()) {
       toast({
-        title: 'Preencha os campos obrigatórios',
-        description: 'Informe seu nome e e-mail para registrar o interesse.',
+        title: t('plans.camposObrigatorios'),
+        description: t('plans.camposObrigatoriosDesc'),
         variant: 'destructive',
       })
       return
@@ -86,9 +131,8 @@ export default function Plans() {
       })
 
       toast({
-        title: 'Interesse registrado com sucesso!',
-        description:
-          'Você será o primeiro a ser notificado quando a cobrança começar, com benefícios de pioneiro.',
+        title: t('plans.sucessoTitulo'),
+        description: t('plans.sucessoDesc'),
       })
 
       setModalOpen(false)
@@ -96,8 +140,8 @@ export default function Plans() {
     } catch (err) {
       console.error(err)
       toast({
-        title: 'Erro ao registrar',
-        description: 'Tente novamente em instantes.',
+        title: t('plans.erroTitulo'),
+        description: t('plans.erroDesc'),
         variant: 'destructive',
       })
     } finally {
@@ -108,17 +152,29 @@ export default function Plans() {
   const getPlanName = (p: PlanType | null) => {
     switch (p) {
       case 'gratis':
-        return 'Plano Gratuito'
+        return t('plans.planoGratuito')
       case 'pro_mensal':
-        return 'Plano Pro (Mensal)'
+        return t('plans.planoProMensal')
       case 'pro_anual':
-        return 'Plano Pro (Anual)'
+        return t('plans.planoProAnual')
       case 'mentoria':
-        return 'Mentoria Executiva'
+        return t('plans.planoMentoria')
       default:
-        return 'Plano'
+        return t('plans.plano')
     }
   }
+
+  const PLAN_FIELD: Record<PlanKey, 'planFree' | 'planPro' | 'planMentoria'> = {
+    gratis: 'planFree',
+    pro: 'planPro',
+    mentoria: 'planMentoria',
+  }
+
+  // Ordem dos cartões: a que o dono configurou; filtro os planos ocultos/removidos.
+  const planEntries = settings.plansOrder
+    .map((key) => ({ key, plan: settings[PLAN_FIELD[key]] as PlanSettings | null }))
+    .filter((entry): entry is { key: PlanKey; plan: PlanSettings } => !!entry.plan)
+    .map((entry) => ({ ...entry, ...PLAN_CARD_STYLES[entry.key] }))
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
@@ -138,46 +194,9 @@ export default function Plans() {
         </p>
       </div>
 
-      {/* Pricing Cards Grid */}
+      {/* Pricing Cards Grid — só os planos visíveis, na ordem configurada pelo dono */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
-        {(
-          [
-            {
-              key: 'gratis' as const,
-              plan: settings.planFree,
-              cardClass:
-                'border-border hover:shadow-lg transition-all flex flex-col justify-between bg-white',
-              badgeClass: 'bg-slate-100 text-slate-700',
-              checkClass: 'text-emerald-500',
-              btnClass: 'w-full mt-6',
-              highlighted: false,
-              planType: 'gratis' as PlanType,
-            },
-            {
-              key: 'pro' as const,
-              plan: settings.planPro,
-              cardClass:
-                'border-2 border-blue-600 shadow-xl relative flex flex-col justify-between bg-white scale-105',
-              badgeClass: 'bg-blue-100 text-blue-800 font-semibold',
-              checkClass: 'text-blue-600',
-              btnClass:
-                'w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md shadow-blue-500/20',
-              highlighted: true,
-              planType: 'pro_mensal' as PlanType,
-            },
-            {
-              key: 'mentoria' as const,
-              plan: settings.planMentoria,
-              cardClass:
-                'border-border hover:shadow-lg transition-all flex flex-col justify-between bg-white',
-              badgeClass: 'text-indigo-700 border-indigo-200 bg-indigo-50',
-              checkClass: 'text-indigo-500',
-              btnClass: 'w-full mt-6 border-indigo-200 text-indigo-700 hover:bg-indigo-50',
-              highlighted: false,
-              planType: 'mentoria' as PlanType,
-            },
-          ] as const
-        ).map(
+        {planEntries.map(
           ({ key, plan, cardClass, badgeClass, checkClass, btnClass, highlighted, planType }) => (
             <Card key={key} className={cardClass}>
               {highlighted && plan.badge && (
@@ -307,51 +326,50 @@ export default function Plans() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-lg font-bold text-slate-900">
-              Registrar Interesse: {getPlanName(selectedPlan)}
+              {t('plans.interesse')}: {getPlanName(selectedPlan)}
             </DialogTitle>
             <DialogDescription className="text-xs text-slate-500">
-              A cobrança ainda não está ativa. Cadastre seus dados para receber o convite pioneiro
-              com desconto quando liberarmos as assinaturas.
+              {t('plans.modalDesc')}
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSubmitInterest} className="space-y-4 pt-2">
             <div className="space-y-1.5">
               <Label htmlFor="interest-name" className="text-xs">
-                Seu Nome Completo
+                {t('plans.nome')}
               </Label>
               <Input
                 id="interest-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Ex: João da Silva"
+                placeholder={t('plans.nomePlaceholder')}
                 required
               />
             </div>
 
             <div className="space-y-1.5">
               <Label htmlFor="interest-email" className="text-xs">
-                Seu Melhor E-mail
+                {t('plans.seuEmail')}
               </Label>
               <Input
                 id="interest-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="seu.email@exemplo.com"
+                placeholder={t('plans.emailPlaceholder')}
                 required
               />
             </div>
 
             <div className="space-y-1.5">
               <Label htmlFor="interest-notes" className="text-xs">
-                O que você mais gostaria de aprender? (Opcional)
+                {t('plans.notas')}
               </Label>
               <Textarea
                 id="interest-notes"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Ex: Quero aplicar Lean Product Development no meu time de software / aeroespacial..."
+                placeholder={t('plans.notasPlaceholder')}
                 rows={3}
               />
             </div>
@@ -364,14 +382,14 @@ export default function Plans() {
                 disabled={submitting}
                 className="text-xs"
               >
-                Cancelar
+                {t('common.cancel')}
               </Button>
               <Button
                 type="submit"
                 disabled={submitting}
                 className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold"
               >
-                {submitting ? 'Registrando...' : 'Confirmar Interesse'}
+                {submitting ? t('plans.enviando') : t('plans.confirmar')}
               </Button>
             </div>
           </form>

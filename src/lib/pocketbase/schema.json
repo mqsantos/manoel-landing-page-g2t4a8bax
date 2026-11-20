@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-08T18:08:35.133Z",
+  "generatedAt": "2026-11-20T16:54:30.169Z",
   "collections": [
     {
       "name": "users",
@@ -433,6 +433,18 @@
         },
         {
           "name": "footer",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "plans_visible",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "plans_order",
           "type": "json",
           "required": false,
           "system": false

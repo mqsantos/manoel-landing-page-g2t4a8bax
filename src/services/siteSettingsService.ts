@@ -63,7 +63,12 @@ export interface PlanSettings {
   button: string
   /** Uma linha por benefício. Começar a linha com "!" marca benefício não incluído. */
   benefits: string[]
+  /** Se o plano aparece na página pública "Planos & Assinatura" (padrão: visível). */
+  visible: boolean
 }
+
+/** Ordem de exibição dos planos na página pública, por chave do plano. */
+export type PlanKey = 'gratis' | 'pro' | 'mentoria'
 
 export interface SiteSettings {
   headline: string
@@ -78,9 +83,11 @@ export interface SiteSettings {
   ctaButtons: CtaButtons
   ctaBanner: CtaBanner
   plansHeader: PlansHeader
-  planFree: PlanSettings
-  planPro: PlanSettings
-  planMentoria: PlanSettings
+  planFree: PlanSettings | null
+  planPro: PlanSettings | null
+  planMentoria: PlanSettings | null
+  /** Ordem de exibição dos planos na página pública. */
+  plansOrder: PlanKey[]
   footer: FooterSettings
   profilePhotoUrl: string
 }
@@ -150,6 +157,7 @@ const DEFAULT_SITE_SETTINGS: SiteSettings = {
     title: 'Planos transparentes para acelerar sua carreira em engenharia',
     text: 'Hoje todo o acervo já pode ser explorado livremente. Escolha seu plano de preferência e registre seu interesse para garantir condições exclusivas de fundador quando a cobrança começar.',
   },
+  plansOrder: ['gratis', 'pro', 'mentoria'],
   planFree: {
     name: 'Membro Grátis',
     badge: 'Livre',
@@ -165,6 +173,7 @@ const DEFAULT_SITE_SETTINGS: SiteSettings = {
       '!Masterclasses avançadas em vídeo',
       '!Templates editáveis em PDF (A3 Framework)',
     ],
+    visible: true,
   },
   planPro: {
     name: 'Membro Pro',
@@ -181,6 +190,7 @@ const DEFAULT_SITE_SETTINGS: SiteSettings = {
       'Estudos de caso reais de engenharia aeroespacial e sistemas',
       'Badge exclusivo de Membro Fundador',
     ],
+    visible: true,
   },
   planMentoria: {
     name: 'Mentoria Executiva',
@@ -197,6 +207,7 @@ const DEFAULT_SITE_SETTINGS: SiteSettings = {
       'Canal direto com Manoel Santos via WhatsApp/Email',
       'Acesso vitalício a todo o acervo Pro',
     ],
+    visible: true,
   },
   footer: {
     brandInitials: 'MS',
@@ -336,7 +347,22 @@ const normalizePlan = (value: unknown, fallback: PlanSettings): PlanSettings => 
     note: typeof raw.note === 'string' ? raw.note : fallback.note,
     button: asText(raw.button, fallback.button),
     benefits: asList(raw.benefits, fallback.benefits),
+    // Plano sem o campo definido continua visível (nada some sem ação do dono).
+    visible: typeof raw.visible === 'boolean' ? raw.visible : fallback.visible,
   }
+}
+
+const PLAN_KEY_FALLBACK: PlanKey[] = ['gratis', 'pro', 'mentoria']
+
+const normalizePlansOrder = (value: unknown): PlanKey[] => {
+  if (!Array.isArray(value) || value.length === 0) return PLAN_KEY_FALLBACK
+  const keys = value
+    .map((k) => String(k))
+    .filter((k): k is PlanKey => PLAN_KEY_FALLBACK.includes(k as PlanKey))
+  const unique = Array.from(new Set(keys))
+  // Garante que todo plano existente esteja na ordem (sem perder nenhum).
+  for (const k of PLAN_KEY_FALLBACK) if (!unique.includes(k)) unique.push(k)
+  return unique
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -358,6 +384,7 @@ const fromRecord = (r: any): SiteSettings => {
     planFree: normalizePlan(r.plan_free, d.planFree),
     planPro: normalizePlan(r.plan_pro, d.planPro),
     planMentoria: normalizePlan(r.plan_mentoria, d.planMentoria),
+    plansOrder: normalizePlansOrder(r.plans_order),
     footer: normalizeFooter(r.footer, d.footer),
     profilePhotoUrl: r.profile_photo ? pb.files.getUrl(r, r.profile_photo) : DEFAULT_PHOTO_URL,
   }
@@ -395,6 +422,7 @@ export const SiteSettingsService = {
     body.append('plan_free', JSON.stringify(settings.planFree))
     body.append('plan_pro', JSON.stringify(settings.planPro))
     body.append('plan_mentoria', JSON.stringify(settings.planMentoria))
+    body.append('plans_order', JSON.stringify(settings.plansOrder))
     body.append('footer', JSON.stringify(settings.footer))
     if (photo) body.append('profile_photo', photo)
 

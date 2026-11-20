@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
+import { useLanguage, type Lang } from '@/lib/i18n'
 import {
   BookOpen,
   Menu,
@@ -25,6 +26,7 @@ import {
 
 export const Navbar: React.FC = () => {
   const { user, isOwner, logout } = useAuth()
+  const { lang, setLang, t } = useLanguage()
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -34,10 +36,35 @@ export const Navbar: React.FC = () => {
   }
 
   const navLinks = [
-    { title: 'Início', path: '/' },
-    { title: 'Conteúdos', path: '/conteudos' },
-    { title: 'Planos & Assinatura', path: '/planos' },
+    { title: t('nav.inicio'), path: '/' },
+    { title: t('nav.conteudos'), path: '/conteudos' },
+    { title: t('nav.planos'), path: '/planos' },
   ]
+
+  /** Par de botões PT/EN — compacto, serve para desktop e mobile. */
+  const langToggle = (extraClass = '') => (
+    <div
+      className={`flex items-center rounded-full border border-border bg-muted/40 p-0.5 ${extraClass}`}
+      role="group"
+      aria-label={t('lang.label')}
+    >
+      {(['pt', 'en'] as Lang[]).map((l) => (
+        <button
+          key={l}
+          type="button"
+          onClick={() => setLang(l)}
+          aria-pressed={lang === l}
+          className={`px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase transition-colors ${
+            lang === l
+              ? 'bg-blue-600 text-white shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          {l}
+        </button>
+      ))}
+    </div>
+  )
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 transition-colors">
@@ -87,7 +114,7 @@ export const Navbar: React.FC = () => {
                   className="gap-1.5 text-xs h-8 border-blue-200 hover:bg-blue-50 text-blue-700 dark:text-blue-300"
                 >
                   <Layers className="w-3.5 h-3.5" />
-                  Painel do Dono
+                  {t('nav.painel')}
                 </Button>
               </Link>
               <Link to="/estatisticas">
@@ -97,11 +124,12 @@ export const Navbar: React.FC = () => {
                   className="gap-1.5 text-xs h-8 border-slate-200 hover:bg-slate-50 text-slate-700 dark:text-slate-300"
                 >
                   <BarChart3 className="w-3.5 h-3.5" />
-                  Estatísticas
+                  {t('nav.estatisticas')}
                 </Button>
               </Link>
             </div>
           )}
+          {langToggle()}
         </nav>
 
         {/* Auth CTA Right */}
@@ -136,7 +164,7 @@ export const Navbar: React.FC = () => {
                 <DropdownMenuItem asChild>
                   <Link to="/perfil" className="flex items-center gap-2 cursor-pointer">
                     <User className="w-4 h-4" />
-                    Meu Perfil
+                    {t('nav.meuPerfil')}
                   </Link>
                 </DropdownMenuItem>
                 {isOwner && (
@@ -147,7 +175,7 @@ export const Navbar: React.FC = () => {
                         className="flex items-center gap-2 cursor-pointer text-blue-600"
                       >
                         <Layers className="w-4 h-4" />
-                        Gerenciar Conteúdos
+                        {t('nav.painel')}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
@@ -156,7 +184,7 @@ export const Navbar: React.FC = () => {
                         className="flex items-center gap-2 cursor-pointer text-blue-600"
                       >
                         <BarChart3 className="w-4 h-4" />
-                        Métricas & Leads
+                        {t('nav.estatisticas')}
                       </Link>
                     </DropdownMenuItem>
                   </>
@@ -167,7 +195,7 @@ export const Navbar: React.FC = () => {
                   className="text-red-600 cursor-pointer flex items-center gap-2"
                 >
                   <LogOut className="w-4 h-4" />
-                  Sair
+                  {t('nav.sair')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -175,7 +203,7 @@ export const Navbar: React.FC = () => {
             <div className="flex items-center gap-2">
               <Link to="/login">
                 <Button variant="ghost" size="sm" className="text-sm">
-                  Entrar
+                  {t('nav.entrar')}
                 </Button>
               </Link>
               <Link to="/cadastro">
@@ -183,7 +211,7 @@ export const Navbar: React.FC = () => {
                   size="sm"
                   className="bg-blue-600 hover:bg-blue-700 text-white text-sm shadow-sm"
                 >
-                  Criar conta grátis
+                  {t('nav.criarConta')}
                 </Button>
               </Link>
             </div>
@@ -192,6 +220,7 @@ export const Navbar: React.FC = () => {
 
         {/* Mobile menu trigger */}
         <div className="flex md:hidden items-center gap-2">
+          {langToggle()}
           {user && (
             <Link to="/perfil">
               <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">
@@ -203,7 +232,7 @@ export const Navbar: React.FC = () => {
             variant="ghost"
             size="icon"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Abrir menu"
+            aria-label={t('nav.menu')}
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </Button>
@@ -241,7 +270,7 @@ export const Navbar: React.FC = () => {
                 className="px-3 py-2 rounded-md text-sm font-medium text-blue-600 hover:bg-blue-50 flex items-center gap-2"
               >
                 <Layers className="w-4 h-4" />
-                Painel do Dono
+                {t('nav.painel')}
               </Link>
               <Link
                 to="/estatisticas"
@@ -249,7 +278,7 @@ export const Navbar: React.FC = () => {
                 className="px-3 py-2 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-100 flex items-center gap-2"
               >
                 <BarChart3 className="w-4 h-4" />
-                Estatísticas
+                {t('nav.estatisticas')}
               </Link>
             </div>
           )}
@@ -262,7 +291,9 @@ export const Navbar: React.FC = () => {
                   onClick={() => setMobileMenuOpen(false)}
                   className="px-3 py-2 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-100 flex items-center justify-between"
                 >
-                  <span>Meu Perfil ({user.name})</span>
+                  <span>
+                    {t('nav.meuPerfil')} ({user.name})
+                  </span>
                   <User className="w-4 h-4 text-muted-foreground" />
                 </Link>
                 <Button
@@ -275,19 +306,19 @@ export const Navbar: React.FC = () => {
                   className="w-full text-red-600 border-red-200 justify-start"
                 >
                   <LogOut className="w-4 h-4 mr-2" />
-                  Sair da Conta
+                  {t('nav.sair')}
                 </Button>
               </>
             ) : (
               <div className="flex flex-col gap-2">
                 <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
                   <Button variant="outline" className="w-full justify-center">
-                    Entrar
+                    {t('nav.entrar')}
                   </Button>
                 </Link>
                 <Link to="/cadastro" onClick={() => setMobileMenuOpen(false)}>
                   <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white justify-center">
-                    Criar conta grátis
+                    {t('nav.criarConta')}
                   </Button>
                 </Link>
               </div>

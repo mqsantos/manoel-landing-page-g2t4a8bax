@@ -12,92 +12,7 @@ import { SiteSettings, SiteSettingsService } from '@/services/siteSettingsServic
 import { invalidateSiteSettings } from '@/hooks/use-site-settings'
 import { LinesEditor, SkillEditor } from '@/components/owner/SettingsFormFields'
 import { FooterSettingsTab } from '@/components/owner/FooterSettingsTab'
-
-/** Editor de um plano (nome, badge, descrição, preço e benefícios). */
-function PlanEditor({
-  plan,
-  onChange,
-}: {
-  plan: SiteSettings['planFree']
-  onChange: (next: SiteSettings['planFree']) => void
-}) {
-  return (
-    <div className="space-y-3">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div className="space-y-1.5">
-          <Label className="text-xs font-semibold">Nome do plano</Label>
-          <Input
-            value={plan.name}
-            onChange={(e) => onChange({ ...plan, name: e.target.value })}
-            className="text-xs"
-          />
-        </div>
-        <div className="space-y-1.5">
-          <Label className="text-xs font-semibold">Selo (badge)</Label>
-          <Input
-            value={plan.badge}
-            onChange={(e) => onChange({ ...plan, badge: e.target.value })}
-            className="text-xs"
-            placeholder="Ex: Completo, Vagas Limitadas"
-          />
-        </div>
-      </div>
-      <div className="space-y-1.5">
-        <Label className="text-xs font-semibold">Descrição curta</Label>
-        <Textarea
-          value={plan.description}
-          onChange={(e) => onChange({ ...plan, description: e.target.value })}
-          className="text-xs"
-          rows={2}
-        />
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div className="space-y-1.5">
-          <Label className="text-xs font-semibold">Preço</Label>
-          <Input
-            value={plan.price}
-            onChange={(e) => onChange({ ...plan, price: e.target.value })}
-            className="text-xs"
-            placeholder="Ex: R$ 59"
-          />
-        </div>
-        <div className="space-y-1.5">
-          <Label className="text-xs font-semibold">Nota ao lado do preço</Label>
-          <Input
-            value={plan.priceNote}
-            onChange={(e) => onChange({ ...plan, priceNote: e.target.value })}
-            className="text-xs"
-            placeholder="Ex: / mês (ou R$ 49/mês no anual)"
-          />
-        </div>
-      </div>
-      <div className="space-y-1.5">
-        <Label className="text-xs font-semibold">Observação abaixo do preço</Label>
-        <Input
-          value={plan.note}
-          onChange={(e) => onChange({ ...plan, note: e.target.value })}
-          className="text-xs"
-          placeholder="Opcional — ex: Cobrança ainda não iniciada..."
-        />
-      </div>
-      <div className="space-y-1.5">
-        <Label className="text-xs font-semibold">Texto do botão do plano</Label>
-        <Input
-          value={plan.button}
-          onChange={(e) => onChange({ ...plan, button: e.target.value })}
-          className="text-xs"
-          placeholder="Ex: Quero Assinar Pro (Registrar Interesse)"
-        />
-      </div>
-      <LinesEditor
-        label="Benefícios"
-        hint='Uma linha por benefício. Comece com "!" para marcar como não incluído (aparece com cadeado).'
-        rows={plan.benefits}
-        onChange={(benefits) => onChange({ ...plan, benefits })}
-      />
-    </div>
-  )
-}
+import { PlansSettingsTab } from '@/components/owner/PlansSettingsTab'
 
 export default function SiteSettingsEditor() {
   const { toast } = useToast()
@@ -452,62 +367,7 @@ export default function SiteSettingsEditor() {
 
           {/* ============ ABA PLANOS ============ */}
           <TabsContent value="planos" className="space-y-6">
-            {/* Cabeçalho da página */}
-            <div className="space-y-3">
-              <h3 className="text-sm font-bold text-slate-900">Cabeçalho da página</h3>
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Selo (badge)</Label>
-                <Input
-                  value={settings.plansHeader.badge}
-                  onChange={(e) =>
-                    patch({ plansHeader: { ...settings.plansHeader, badge: e.target.value } })
-                  }
-                  className="text-xs"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Título</Label>
-                <Input
-                  value={settings.plansHeader.title}
-                  onChange={(e) =>
-                    patch({ plansHeader: { ...settings.plansHeader, title: e.target.value } })
-                  }
-                  className="text-xs"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Texto de apresentação</Label>
-                <Textarea
-                  value={settings.plansHeader.text}
-                  onChange={(e) =>
-                    patch({ plansHeader: { ...settings.plansHeader, text: e.target.value } })
-                  }
-                  className="text-xs"
-                  rows={3}
-                />
-              </div>
-            </div>
-
-            {/* Plano Grátis */}
-            <div className="pt-2 border-t border-slate-100 space-y-3">
-              <h3 className="text-sm font-bold text-slate-900">Plano Grátis</h3>
-              <PlanEditor plan={settings.planFree} onChange={(planFree) => patch({ planFree })} />
-            </div>
-
-            {/* Plano Pro */}
-            <div className="pt-2 border-t border-slate-100 space-y-3">
-              <h3 className="text-sm font-bold text-slate-900">Plano Pro</h3>
-              <PlanEditor plan={settings.planPro} onChange={(planPro) => patch({ planPro })} />
-            </div>
-
-            {/* Mentoria */}
-            <div className="pt-2 border-t border-slate-100 space-y-3">
-              <h3 className="text-sm font-bold text-slate-900">Mentoria Executiva</h3>
-              <PlanEditor
-                plan={settings.planMentoria}
-                onChange={(planMentoria) => patch({ planMentoria })}
-              />
-            </div>
+            <PlansSettingsTab settings={settings} onPatch={patch} />
           </TabsContent>
 
           {/* ============ ABA RODAPÉ ============ */}
